@@ -3,7 +3,19 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29709.97
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Appdash.Client.Web", "Appdash.Client.Web\Appdash.Client.Web.csproj", "{DF39E001-047D-4369-A989-484DD7E3B30D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AppDash.Client.Web", "AppDash.Client.Web\AppDash.Client.Web.csproj", "{DF39E001-047D-4369-A989-484DD7E3B30D}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AppDash.Server", "AppDash.Server\AppDash.Server.csproj", "{B3449BAF-535C-4A8F-9D23-009DF26E228D}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AppDash.Server.Services", "AppDash.Server.Services\AppDash.Server.Services.csproj", "{E27ED261-9487-487D-A416-A526B0FDEA26}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AppDash.Server.Plugins", "AppDash.Server.Plugins\AppDash.Server.Plugins.csproj", "{72019130-00A6-4598-B679-3184064A89B8}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Plugins", "Plugins", "{E1CC3FFE-060C-45D7-9AC3-BD193F60E3D6}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AppDash.Plugins.QBittorrentPlugin", "Plugins\AppDash.Plugins.QBittorrentPlugin\AppDash.Plugins.QBittorrentPlugin.csproj", "{D54F5FE0-F707-49C7-9E35-A000047DCD6E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AppDash.Plugins", "AppDash.Plugins\AppDash.Plugins.csproj", "{7A912610-73FF-45EB-BA09-AA1C05685CD6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,9 +27,32 @@ Global
 		{DF39E001-047D-4369-A989-484DD7E3B30D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DF39E001-047D-4369-A989-484DD7E3B30D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DF39E001-047D-4369-A989-484DD7E3B30D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B3449BAF-535C-4A8F-9D23-009DF26E228D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B3449BAF-535C-4A8F-9D23-009DF26E228D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B3449BAF-535C-4A8F-9D23-009DF26E228D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B3449BAF-535C-4A8F-9D23-009DF26E228D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E27ED261-9487-487D-A416-A526B0FDEA26}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E27ED261-9487-487D-A416-A526B0FDEA26}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E27ED261-9487-487D-A416-A526B0FDEA26}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E27ED261-9487-487D-A416-A526B0FDEA26}.Release|Any CPU.Build.0 = Release|Any CPU
+		{72019130-00A6-4598-B679-3184064A89B8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{72019130-00A6-4598-B679-3184064A89B8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{72019130-00A6-4598-B679-3184064A89B8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{72019130-00A6-4598-B679-3184064A89B8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D54F5FE0-F707-49C7-9E35-A000047DCD6E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D54F5FE0-F707-49C7-9E35-A000047DCD6E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D54F5FE0-F707-49C7-9E35-A000047DCD6E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D54F5FE0-F707-49C7-9E35-A000047DCD6E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7A912610-73FF-45EB-BA09-AA1C05685CD6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7A912610-73FF-45EB-BA09-AA1C05685CD6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7A912610-73FF-45EB-BA09-AA1C05685CD6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7A912610-73FF-45EB-BA09-AA1C05685CD6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{D54F5FE0-F707-49C7-9E35-A000047DCD6E} = {E1CC3FFE-060C-45D7-9AC3-BD193F60E3D6}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {83CEC82D-1C8F-49E2-B968-1251B482F1EE}

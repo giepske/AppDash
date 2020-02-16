@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Blazor.Server" Version="3.2.0-preview1.20073.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\AppDash.Client.Web\AppDash.Client.Web.csproj" />
+    <ProjectReference Include="..\AppDash.Server.Plugins\AppDash.Server.Plugins.csproj" />
+    <ProjectReference Include="..\AppDash.Server.Services\AppDash.Server.Services.csproj" />
+  </ItemGroup>
+
+
+</Project>

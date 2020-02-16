@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using System.Text;
+﻿using System.Threading.Tasks;
+using AppDash.Client.Web;
 using Microsoft.AspNetCore.Blazor.Hosting;
-using Microsoft.Extensions.DependencyInjection;
 
-namespace Appdash.Client.Web
+namespace AppDash.Client.Web
 {
     public class Program
     {
