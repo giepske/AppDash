@@ -1,6 +1,25 @@
 ﻿@page "/"
 
-@foreach (ComponentBase component in _components)
-{
-    @RenderComponent(component)
-}
+    <Grid>
+        @foreach (ComponentBase component in _components)
+        {
+            <GridItem>
+                @RenderComponent(component)
+            </GridItem>
+            <GridItem>
+                @RenderComponent(component)
+            </GridItem>
+            <GridItem>
+                @RenderComponent(component)
+            </GridItem>
+            <GridItem>
+                @RenderComponent(component)
+            </GridItem>
+            <GridItem>
+                @RenderComponent(component)
+            </GridItem>
+            <GridItem>
+                @RenderComponent(component)
+            </GridItem>
+        }
+    </Grid>
