@@ -2,13 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using AppDash.Plugins;
-using AppDash.Plugins.Tiles;
+using AppDash.Plugins.Pages;
 
 namespace TorrentPlugin
 {
-    public class RTorrentTile : UpdatingTile<RTorrentPlugin, RTorrentTileComponent>
+    public class RTorrentPage : UpdatingPage<RTorrentPlugin, RTorrentPageComponent>
     {
-        public RTorrentTile(RTorrentPlugin plugin) : base(plugin, TimeSpan.FromSeconds(1))
+        public RTorrentPage(RTorrentPlugin plugin) : base(plugin, TimeSpan.FromSeconds(1))
         {
         }
 

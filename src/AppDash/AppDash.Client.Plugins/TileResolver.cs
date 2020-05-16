@@ -17,7 +17,7 @@ namespace AppDash.Client.Plugins
         {
             var tileInstance = (TileComponent) Activator.CreateInstance(tileType);
 
-            _tiles.Add(tileType.FullName, tileInstance);
+            _tiles[tileType.FullName] = tileInstance;
 
             return tileInstance;
         }

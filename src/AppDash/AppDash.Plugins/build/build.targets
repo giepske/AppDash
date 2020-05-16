@@ -19,7 +19,7 @@
   </UsingTask>
   -->
 
-  <Target Name="CreatePluginFolderTask" AfterTargets="AfterBuild">
+  <Target Name="CreatePluginFolderTask" AfterTargets="PostBuildEvent">
     <PropertyGroup>
       <PackageDirectory>$(TargetDir)$(TargetName)</PackageDirectory>
     </PropertyGroup>

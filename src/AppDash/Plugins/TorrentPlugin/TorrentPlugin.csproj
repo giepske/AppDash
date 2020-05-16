@@ -31,10 +31,10 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
-
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="echo f | xcopy /f /y &quot;$(TargetDir)$(TargetName).dll&quot; &quot;$(SolutionDir)AppDash.Server\bin\Debug\netcoreapp3.1\plugins\$(TargetName)\$(TargetName).dll&quot;" />
-  </Target>
-
+  
   <Import Project=".\build\build.targets" />
+  
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="XCOPY &quot;$(TargetDir)$(TargetName)&quot; &quot;$(SolutionDir)AppDash.Server\bin\Debug\netcoreapp3.1\plugins\$(TargetName)\&quot; /S /Y" />
+  </Target>
 </Project>

@@ -4,19 +4,19 @@ using AppDash.Core;
 using AppDash.Server.Core.Communication;
 using Microsoft.AspNetCore.SignalR;
 
-namespace AppDash.Plugins.Tiles
+namespace AppDash.Plugins.Pages
 {
     /// <summary>
-    /// A tile that can be updated in real time.
+    /// A page that can be updated in real time.
     /// </summary>
-    /// <typeparam name="TPlugin">The derived <see cref="AppDashPlugin"/> this tile belongs to.</typeparam>
-    /// <typeparam name="TRazorComponent">The derived <see cref="TileComponent"/> this tile belongs to.</typeparam>
-    public abstract class RealtimeTile<TPlugin, TRazorComponent> : Tile<TPlugin, TRazorComponent> where TPlugin : AppDashPlugin where TRazorComponent : TileComponent
+    /// <typeparam name="TPlugin">The derived <see cref="AppDashPlugin"/> this page belongs to.</typeparam>
+    /// <typeparam name="TRazorComponent">The derived <see cref="PageComponent"/> this page belongs to.</typeparam>
+    public abstract class RealtimePage<TPlugin, TRazorComponent> : Page<TPlugin, TRazorComponent> where TPlugin : AppDashPlugin where TRazorComponent : PageComponent
     {
         private IHubContext<ChatHub> _hubContext;
         private PermissionMemoryCache _permissionMemoryCache;
 
-        protected RealtimeTile(TPlugin plugin) : base(plugin, TileType.RealtimeData, TimeSpan.MinValue, false)
+        protected RealtimePage(TPlugin plugin) : base(plugin, PageType.RealtimeData, TimeSpan.MinValue, false)
         {
 
         }

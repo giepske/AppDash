@@ -39,14 +39,17 @@ namespace AppDash.Server.Plugins
             if (_pluginFiles.ContainsKey(filename))
                 return true;
 
-            if (_fileService.PluginFileExists(filename))
+            lock (_pluginFiles)
             {
-                _pluginFiles[filename] = _fileService.LoadPluginFile(filename);
+                if (_fileService.PluginFileExists(filename))
+                {
+                    _pluginFiles[filename] = _fileService.LoadPluginFile(filename);
 
-                return true;
+                    return true;
+                }
+
+                return false;
             }
-
-            return false;
         }
 
         /// <summary>
@@ -71,14 +74,17 @@ namespace AppDash.Server.Plugins
             if (_pluginIconFiles.ContainsKey(pluginKey))
                 return true;
 
-            if (_fileService.PluginIconFileExists(pluginFileName, iconFileName))
+            lock (_pluginIconFiles)
             {
-                _pluginIconFiles[pluginKey] = _fileService.LoadPluginIconFile(pluginFileName, iconFileName);
+                if (_fileService.PluginIconFileExists(pluginFileName, iconFileName))
+                {
+                    _pluginIconFiles[pluginKey] = _fileService.LoadPluginIconFile(pluginFileName, iconFileName);
 
-                return true;
+                    return true;
+                }
+
+                return false;
             }
-
-            return false;
         }
 
         public byte[] GetPluginIcon(string pluginKey)

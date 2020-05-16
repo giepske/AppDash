@@ -5,7 +5,7 @@
 .pluginloaderoverlay-inner {
     height: 100vh;
     position: fixed;
-    background: #272f30;
+    background: var(--primary-bg-color);
     width: 100%;
     display: flex;
     justify-content: center;

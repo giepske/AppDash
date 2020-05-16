@@ -23,6 +23,14 @@
     display: flex;
     flex-direction: row;
     align-items: center;
+    color: white;
+    text-decoration: none;
+    transition: 1s all;
+}
+
+.navmenu-item:hover {
+    background: var(--primary-color);
+    transition: 1s all;
 }
 
 .navmenu-item-icon {
@@ -37,9 +45,14 @@
     white-space: nowrap;
     opacity: 0;
     transition: 1s all;
+    text-decoration: none !important;
 }
 
 .navmenu:hover .navmenu-item-text {
     opacity: 1;
     transition: 1s all;
+}
+
+.navmenu-item-href {
+    text-decoration: none !important;
 }

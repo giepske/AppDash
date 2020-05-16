@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using AppDash.Plugins;
 
 namespace AppDash.Client.Plugins
@@ -17,7 +18,7 @@ namespace AppDash.Client.Plugins
         {
             var pluginInstance = (AppDashPlugin)Activator.CreateInstance(pluginType);
 
-            _plugins.Add(pluginType.FullName, pluginInstance);
+            _plugins[pluginType.FullName] = pluginInstance;
 
             return pluginInstance;
         }
@@ -35,6 +36,11 @@ namespace AppDash.Client.Plugins
         public void ClearPlugins()
         {
             _plugins.Clear();
+        }
+
+        public AppDashPlugin GetPlugin(Type pluginType)
+        {
+            return _plugins.Values.FirstOrDefault(plugin => plugin.GetType() == pluginType);
         }
     }
 }

@@ -1,25 +1,32 @@
 ﻿@using AppDash.Client.Plugins
 @using AppDash.Plugins
+@using AppDash.Plugins.Pages
 @inject PluginManager PluginManager
+@inject PageManager PageManager
 
 <div class="navmenu">
     @if (_plugins != null)
     {
-        foreach (AppDashPlugin plugin in _plugins)
+        foreach (var plugin in _plugins)
         {
-            <NavMenuItem Text="@plugin.Name" Icon="@($"/plugins/{plugin.Key}/icon")"></NavMenuItem>
+            <NavMenuItem Text="@plugin.Item1.Name" Icon="@($"/plugins/{plugin.Item1.Key}/icon")" 
+                         Page="@(plugin.Item2?.RelativePath != null ? $"/plugin/{plugin.Item1.Key}/{plugin.Item2.RelativePath}" : null)">
+            </NavMenuItem>
         }
     }
 </div>
 
 @code {
-    private List<AppDashPlugin> _plugins;
+    private List<Tuple<AppDashPlugin, PageComponent>> _plugins = new List<Tuple<AppDashPlugin, PageComponent>>();
 
     protected override async Task OnInitializedAsync()
     {
-        _plugins = (await PluginManager.GetPlugins()).ToList();
+        var plugins = (await PluginManager.GetPlugins()).ToList();
 
-        Console.WriteLine(_plugins.Count);
+        foreach (AppDashPlugin plugin in plugins)
+        {
+            _plugins.Add(new Tuple<AppDashPlugin, PageComponent>(plugin, await PageManager.GetMainPage(plugin.GetType())));
+        }
 
         StateHasChanged();
 

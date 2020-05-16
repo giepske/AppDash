@@ -1,21 +1,21 @@
 ﻿using Microsoft.AspNetCore.Components;
 
-namespace AppDash.Plugins.PluginPages
+namespace AppDash.Plugins.Pages
 {
     /// <summary>
-    /// A Blazor tile component.
+    /// A Blazor page component.
     /// </summary>
-    public abstract class PluginPage : ComponentBase
+    public abstract class PageComponent : ComponentBase
     {
         /// <summary>
-        /// The page part of the url, comes after the plugin key. The url has the following template: https://example.com/plugins/{PluginKey}/{Page}
+        /// The relative URL path of the page, coming after the plugin key. The url has the following template: https://example.com/plugin/{PluginKey}/{RelativePath}
         /// </summary>
-        public abstract string Page { get; set; }
+        public abstract string RelativePath { get; set; }
 
         /// <summary>
-        /// If this tile should redirect to a url you should specify it here.
+        /// Whether this page is the main page, the plugin's menu item will redirect to this page if set to <see langword="true"/>.
         /// </summary>
-        public abstract string Url { get; set; }
+        public abstract bool IsMainPage { get; set; }
 
         /// <summary>
         /// Will be called when data is received, when the tile is first shown or when it receives updated data.

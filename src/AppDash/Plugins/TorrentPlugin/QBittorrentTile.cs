@@ -6,7 +6,7 @@ using AppDash.Plugins.Tiles;
 
 namespace TorrentPlugin
 {
-    public class QBittorrentTile : UpdatingTile<QBitTorrentPlugin, QBittorrentComponent>
+    public class QBittorrentTile : UpdatingTile<QBitTorrentPlugin, QBittorrentTileComponent>
     {
         public QBittorrentTile(QBitTorrentPlugin plugin) : base(plugin, TimeSpan.FromSeconds(5))
         {

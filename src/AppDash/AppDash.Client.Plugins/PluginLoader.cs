@@ -7,6 +7,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using AppDash.Core;
 using AppDash.Plugins;
+using AppDash.Plugins.Pages;
 using AppDash.Plugins.Tiles;
 using Microsoft.AspNetCore.Components;
 using Newtonsoft.Json.Linq;
@@ -22,6 +23,7 @@ namespace AppDash.Client.Plugins
         private readonly PluginManager _pluginManager;
         private readonly TileManager _tileManager;
         private readonly NavigationManager _navigationManager;
+        private readonly PageManager _pageManager;
 
         /// <summary>
         /// This can be called when <see cref="LoadPlugins"/> is called. Fired when a plugin gets downloaded/loaded.
@@ -39,12 +41,21 @@ namespace AppDash.Client.Plugins
         /// </summary>
         public Action<Assembly> OnTilesLoadStart;
 
-        public PluginLoader(HttpClient httpClient, PluginManager pluginManager, TileManager tileManager, NavigationManager navigationManager)
+        /// <summary>
+        /// This can be called when <see cref="LoadPlugins"/> is called. Fired when pages gets loaded from an assembly.
+        /// <para>
+        /// <see cref="Assembly"/> will be the assembly that is being loaded.
+        /// </para>
+        /// </summary>
+        public Action<Assembly> OnPagesLoadStart;
+
+        public PluginLoader(HttpClient httpClient, PluginManager pluginManager, TileManager tileManager, NavigationManager navigationManager, PageManager pageManager)
         {
             _httpClient = httpClient;
             _pluginManager = pluginManager;
             _tileManager = tileManager;
             _navigationManager = navigationManager;
+            _pageManager = pageManager;
         }
 
         /// <summary>
@@ -58,6 +69,7 @@ namespace AppDash.Client.Plugins
         {
             await _pluginManager.PluginLock.WaitAsync();
             await _tileManager.TileLock.WaitAsync();
+            await _pageManager.PageLock.WaitAsync();
 
             //download and load plugins
             try
@@ -99,6 +111,12 @@ namespace AppDash.Client.Plugins
                 _pluginManager.PluginLock.Release();
             }
 
+            await LoadTiles();
+            await LoadPages();
+        }
+
+        private async Task LoadTiles()
+        {
             //load tiles from plugins
             try
             {
@@ -141,6 +159,54 @@ namespace AppDash.Client.Plugins
             {
                 _tileManager.TileLock.Release();
             }
+        }
+
+        private async Task LoadPages()
+        {
+            //load pages from plugins
+            try
+            {
+                List<PageComponent> pages = new List<PageComponent>();
+
+                foreach (var assembly in await _pluginManager.GetAssemblies())
+                {
+                    OnPagesLoadStart?.Invoke(assembly);
+
+                    try
+                    {
+                        pages.AddRange(_pageManager.LoadPages(assembly));
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine(e);
+                    }
+                }
+
+                foreach (PageComponent pageComponent in pages)
+                {
+                    //TODO this doesnt do anything yet, just like the method below. FIX!
+                }
+
+                try
+                {
+                    _pageManager.InitializePages();
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
+            finally
+            {
+                _pageManager.PageLock.Release();
+            }
+
+            Console.WriteLine($"Loaded {(await _pageManager.GetPages()).Count()} pages");
         }
     }
 }

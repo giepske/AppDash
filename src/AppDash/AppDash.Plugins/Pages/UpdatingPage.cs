@@ -5,20 +5,20 @@ using AppDash.Core;
 using AppDash.Server.Core.Communication;
 using Microsoft.AspNetCore.SignalR;
 
-namespace AppDash.Plugins.Tiles
+namespace AppDash.Plugins.Pages
 {
     /// <summary>
-    /// A tile that will be updated after a certain interval.
+    /// A page that will be updated after a certain interval.
     /// </summary>
-    /// <typeparam name="TPlugin">The derived <see cref="AppDashPlugin"/> this tile belongs to.</typeparam>
-    /// <typeparam name="TRazorComponent">The derived <see cref="TileComponent"/> this tile belongs to.</typeparam>
-    public abstract class UpdatingTile<TPlugin, TRazorComponent> : Tile<TPlugin, TRazorComponent> where TPlugin : AppDashPlugin where TRazorComponent : TileComponent
+    /// <typeparam name="TPlugin">The derived <see cref="AppDashPlugin"/> this page belongs to.</typeparam>
+    /// <typeparam name="TRazorComponent">The derived <see cref="PageComponent"/> this page belongs to.</typeparam>
+    public abstract class UpdatingPage<TPlugin, TRazorComponent> : Page<TPlugin, TRazorComponent> where TPlugin : AppDashPlugin where TRazorComponent : PageComponent
     {
         private Timer _backgroundThreadTimer;
         private IHubContext<ChatHub> _hubContext;
         private PermissionMemoryCache _permissionMemoryCache;
 
-        protected UpdatingTile(TPlugin plugin, TimeSpan updateInterval) : base(plugin, TileType.UpdatingData, updateInterval, false)
+        protected UpdatingPage(TPlugin plugin, TimeSpan updateInterval) : base(plugin, PageType.UpdatingData, updateInterval, false)
         {
             _backgroundThreadTimer = new Timer(Callback, null, 0, (int)updateInterval.TotalMilliseconds);
         }
