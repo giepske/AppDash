@@ -1,0 +1,45 @@
+﻿.navmenu {
+    width: 50px;
+    background: var(--secondary-bg-color);
+    box-shadow: 0px 2px 3px 0px rgba(13,13,13,1);
+    position: fixed;
+    height: 100%;
+    transition: 1s all;
+    z-index: 1;
+}
+
+.navmenu:hover {
+    position: absolute;
+    width: 250px;
+    transition: 1s all;
+}
+
+.navmenu-item {
+    background: var(--secondary-color);
+    margin-right: 8px;
+    border-top-right-radius: 55em;
+    border-bottom-right-radius: 55em;
+    height: 42px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.navmenu-item-icon {
+    flex-shrink: 0;
+    width: 24px;
+    height: 24px;
+}
+
+.navmenu-item-text {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+    opacity: 0;
+    transition: 1s all;
+}
+
+.navmenu:hover .navmenu-item-text {
+    opacity: 1;
+    transition: 1s all;
+}

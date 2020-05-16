@@ -6,14 +6,26 @@
     <meta name="viewport" content="width=device-width" />
     <title>Appdash.Client.Web</title>
     <base href="/" />
-    <link href="css/bootstrap/bootstrap.min.css" rel="stylesheet" />
+    <link href="libs/bootstrap-4.4.1/css/bootstrap.min.css" rel="stylesheet" />
     <link href="css/site.css" rel="stylesheet" />
+    <link href="css/variables.css" rel="stylesheet" />
+    <link href="css/components.css" rel="stylesheet" />
     <link href="libs/fontawesome/css/all.min.css" rel="stylesheet" />
 </head>
 
 <body>
-    <app>Loading...</app>
-<script src="_framework/blazor.webassembly.js"></script>
+    <app>
+        <div class="pluginloaderoverlay">
+            <div class="pluginloaderoverlay-inner">
+                <div class="pluginloaderoverlay-info">
+                    <div class="spinner-border mb-4 pluginloaderoverlay-info-spinner" role="status">
+                    </div>
+                    <span class="pluginloaderoverlay-info-text">Loading...</span>
+                </div>
+            </div>
+        </div>
+    </app>
+    <script src="_framework/blazor.webassembly.js"></script>
 </body>
 
 </html>

@@ -1,6 +1,9 @@
-﻿using System.Threading.Tasks;
-using AppDash.Client.Web;
-using Microsoft.AspNetCore.Blazor.Hosting;
+﻿using System;
+using System.Net.Http;
+using System.Threading.Tasks;
+using AppDash.Client.Plugins;
+using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace AppDash.Client.Web
 {
@@ -10,6 +13,16 @@ namespace AppDash.Client.Web
         {
             var builder = WebAssemblyHostBuilder.CreateDefault(args);
             builder.RootComponents.Add<App>("app");
+
+            builder.Services.AddSingleton<PluginManager>();
+            builder.Services.AddSingleton<TileResolver>();
+            builder.Services.AddSingleton<TileManager>();
+            builder.Services.AddSingleton<PluginResolver>();
+            builder.Services.AddSingleton<PluginLoader>();
+            builder.Services.AddSingleton(new HttpClient
+            {
+                BaseAddress = new Uri(builder.HostEnvironment.BaseAddress)
+            });
 
             await builder.Build().RunAsync();
         }

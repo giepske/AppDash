@@ -2,7 +2,7 @@
 
 html, body {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-    background-color: #272f30;
+    background-color: var(--primary-bg-color);
     color: white;
 }
 
@@ -12,66 +12,29 @@ html, body {
 }
 
 .logo-title-text-1 {
-    font-family: 'Gidolinya';
-    color: #006275;
+    font-family: Tahoma, Geneva, sans-serif;
+    color: var(--primary-color);
     font-size: 64px;
 }
 
 .logo-title-text-2 {
-    font-family: 'Gidolinya';
-    color: #04859d;
+    font-family: Tahoma, Geneva, sans-serif;
+    color: var(--secondary-color);
     font-size: 64px;
 }
 
-.grid {
+.main {
     display: flex;
-    flex-wrap: wrap;
-    justify-content: space-evenly;
-}
-
-.grid-item {
-    flex: 0 0 18%;
-    border-radius: 6px;
-    border: 1px solid #04859d;
-    padding: 8px;
-    margin: 1%;
     position: relative;
-    overflow: hidden;
 }
 
-.link {
-    position: absolute;
-    top: 50%;
-    right: -50px;
-    transform: translateY(-50%);
+.main-content {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    margin-left: 50px;
+}
+
+html, body, .main {
     height: 100%;
-    width: 100px;
-    background-color: #0062755e;
-    /*border-radius: 50%;*/
-    overflow: hidden;
-    text-align: center;
-    transition: all 0.5s;
-    box-shadow: 0px 0px 15px 20px #0062755e;
-}
-
-.link i {
-    font-size: 30px;
-    left: 5%;
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    color: white;
-    transition: all 0.5s;
-}
-
-.link:hover {
-    box-shadow: 0px 0px 35px 50px #006275;
-    width: 150px;
-    transition: all 0.5s;
-    background-color: #006275;
-}
-
-.link:hover i{
-    font-size: 60px;
-    transition: all 0.5s;
 }

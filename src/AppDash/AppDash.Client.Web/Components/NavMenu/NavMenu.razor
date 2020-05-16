@@ -1,0 +1,28 @@
+﻿@using AppDash.Client.Plugins
+@using AppDash.Plugins
+@inject PluginManager PluginManager
+
+<div class="navmenu">
+    @if (_plugins != null)
+    {
+        foreach (AppDashPlugin plugin in _plugins)
+        {
+            <NavMenuItem Text="@plugin.Name" Icon="@($"/plugins/{plugin.Key}/icon")"></NavMenuItem>
+        }
+    }
+</div>
+
+@code {
+    private List<AppDashPlugin> _plugins;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _plugins = (await PluginManager.GetPlugins()).ToList();
+
+        Console.WriteLine(_plugins.Count);
+
+        StateHasChanged();
+
+        await base.OnInitializedAsync();
+    }
+}

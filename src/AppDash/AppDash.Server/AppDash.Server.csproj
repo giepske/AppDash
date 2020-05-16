@@ -6,10 +6,15 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Blazor.Server" Version="3.2.0-preview1.20073.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="3.2.0-rc1.20223.4" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="3.1.4" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Protocols.NewtonsoftJson" Version="3.1.4" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\AppDash.Client.Web\AppDash.Client.Web.csproj" />
+    <ProjectReference Include="..\AppDash.Server.Core\AppDash.Server.Core.csproj" />
+    <ProjectReference Include="..\AppDash.Server.Data\AppDash.Server.Data.csproj" />
     <ProjectReference Include="..\AppDash.Server.Plugins\AppDash.Server.Plugins.csproj" />
     <ProjectReference Include="..\AppDash.Server.Services\AppDash.Server.Services.csproj" />
   </ItemGroup>

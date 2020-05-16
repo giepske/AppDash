@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http;
-using System.Reflection;
 using System.Threading.Tasks;
+using AppDash.Client.Plugins;
+using AppDash.Plugins;
+using AppDash.Plugins.Tiles;
 using Microsoft.AspNetCore.Components;
-using Newtonsoft.Json;
+using Microsoft.AspNetCore.SignalR.Client;
 
 namespace AppDash.Client.Web.Pages
 {
@@ -14,66 +15,47 @@ namespace AppDash.Client.Web.Pages
         [Inject]
         private NavigationManager _navigationManager { get; set; }
 
-        private List<ComponentBase> _components;
+        [Inject]
+        private PluginLoader PluginLoader { get; set; }
+
+        [Inject]
+        private PluginManager PluginManager { get; set; }
+
+        [Inject]
+        private TileManager TileManager { get; set; }
+
+        private HubConnection hubConnection;
+
+        private List<TileComponent> _components;
 
         protected override async Task OnInitializedAsync()
         {
-            _components = new List<ComponentBase>();
+            //set events methods
 
-            string s = JsonConvert.False;
+            //await PluginLoader.LoadPlugins();
 
-            Console.WriteLine(s);
+            _components = (await TileManager.GetTiles()).ToList();
 
-            using (HttpClient httpClient = new HttpClient())
+            Console.WriteLine("Components loaded: " + _components.Count);
+
+            hubConnection = new HubConnectionBuilder()
+                .WithUrl(NavigationManager.ToAbsoluteUri("/chatHub"))
+                .Build();
+
+            hubConnection.On<string, PluginData>("UpdateTileData", async (tileKey, pluginData) =>
             {
-                foreach (Assembly assembly in AppDomain.CurrentDomain.GetAssemblies())
-                {
-                    Console.WriteLine(assembly.FullName);
-                }
+                Console.WriteLine("UpdateTileData");
+ 
+                var tile = await TileManager.GetTile(tileKey);
+                if (tile.OnDataReceived(pluginData))
+                    tile.StateHasChanged();
 
-                string url = _navigationManager.BaseUri + "plugins";
+                StateHasChanged();
+            });
 
-                Console.WriteLine(url);
-
-                var assemblies = await httpClient.GetJsonAsync<List<byte[]>>(url);
-
-                try
-                {
-                    for (var i = 0; i < assemblies.Count; i++)
-                    {
-                        Console.WriteLine("Loading " + i);
-
-                        byte[] assemblyBytes = assemblies[i];
-                        Assembly assembly = Assembly.Load(assemblyBytes);
-
-                        foreach (var type in assembly.GetTypes())
-                        {
-                            Console.WriteLine(type.Name);
-
-                            if (type.BaseType == typeof(ComponentBase))
-                            {
-                                _components.Add((ComponentBase)Activator.CreateInstance(type));
-                            }
-                        }
-                    }
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e);
-                }
-            }
+            await hubConnection.StartAsync();
 
             await base.OnInitializedAsync();
-        }
-
-        RenderFragment RenderComponent(ComponentBase component)
-        {
-            return builder =>
-            {
-                builder.OpenComponent(0, component.GetType());
-                builder.AddComponentReferenceCapture(1, inst => { component = (ComponentBase)inst; });
-                builder.CloseComponent();
-            };
         }
     }
 }

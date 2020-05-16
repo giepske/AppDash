@@ -1,0 +1,48 @@
+﻿.pluginloaderoverlay {
+    position: relative;
+}
+
+.pluginloaderoverlay-inner {
+    height: 100vh;
+    position: fixed;
+    background: #272f30;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+.pluginloaderoverlay-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    align-self: center;
+}
+
+.pluginloaderoverlay-info-spinner {
+    width: 4rem;
+    height: 4rem;
+}
+
+.pluginloaderoverlay-info-text {
+
+}
+
+.pluginloaderoverlay-hiding {
+    animation-name: hideoverlay;
+    animation-duration: 1s;
+    animation-fill-mode: forwards;
+}
+
+.pluginloaderoverlay-hidden {
+    display: none;
+}
+
+    @keyframes hideoverlay {
+        from {
+        opacity: 1;
+    }
+
+    to {
+        opacity: 0;
+    }
+}

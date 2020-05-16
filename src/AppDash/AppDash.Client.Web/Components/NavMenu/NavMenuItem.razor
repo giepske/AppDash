@@ -1,0 +1,15 @@
+﻿<div class="navmenu-item my-2">
+    @if (!string.IsNullOrEmpty(Icon))
+    {
+        <img class="navmenu-item-icon ml-2" src="@Icon"/>
+    }
+    <span class="navmenu-item-text ml-2">@Text</span>
+</div>
+
+@code {
+    [Parameter]
+    public string Text { get; set; }
+
+    [Parameter]
+    public string Icon { get; set; }
+}

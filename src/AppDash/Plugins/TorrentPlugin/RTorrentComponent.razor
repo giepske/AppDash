@@ -1,0 +1,25 @@
+﻿@using AppDash.Plugins
+@using System;
+@using System.Globalization
+@using System.Reflection
+@using Microsoft.AspNetCore.Components.Rendering
+@inherits TileComponent
+
+<div class="my-component">
+    This Blazor component is defined in the <strong>TorrentPlugin</strong> package.
+    Current time: @time.ToString("G", CultureInfo.CurrentCulture)
+</div>
+
+@code
+{
+    public override string Url { get; set; }
+
+    DateTime time = DateTime.Now;
+
+    public override bool OnDataReceived(PluginData pluginData)
+    {
+        time = pluginData.GetData<DateTime>("datetime");
+
+        return true;
+    }
+}

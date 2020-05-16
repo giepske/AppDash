@@ -1,0 +1,34 @@
+﻿@using AppDash.Client.Plugins
+@using AppDash.Plugins.Tiles
+@inject PluginManager PluginManager;
+@inject TileManager TileManager;
+
+<div class="tile-content @(string.IsNullOrEmpty(TileComponent.Url) ? "" : "tile-content-link")">
+    @RenderComponent(TileComponent)
+</div>
+@if (!string.IsNullOrEmpty(TileComponent.Url))
+{
+    <a href="@TileComponent.Url" class="tile-link">
+        <i class="fas fa-sign-out-alt"></i>
+    </a>
+}
+
+@code {
+    [Parameter]
+    public TileComponent TileComponent { get; set; }
+
+    RenderFragment RenderComponent(ComponentBase component)
+    {
+        return builder =>
+        {
+            builder.OpenComponent(0, component.GetType());
+            builder.AddComponentReferenceCapture(1, inst =>
+            {
+                component = (ComponentBase)inst;
+                if(component is TileComponent tileComponent)
+                    TileManager.SetTile(tileComponent);
+            });
+            builder.CloseComponent();
+        };
+    }
+}
