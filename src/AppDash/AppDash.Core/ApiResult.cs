@@ -1,10 +1,14 @@
-﻿using System.Net;
+﻿using System.Collections.Generic;
+using System.Net;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using JsonConverter = System.Text.Json.Serialization.JsonConverter;
+using JsonSerializer = Newtonsoft.Json.JsonSerializer;
 
 namespace AppDash.Core
 {
@@ -19,7 +23,11 @@ namespace AppDash.Core
         public ApiResult(HttpStatusCode statusCode, object value)
         {
             StatusCode = (int)statusCode;
-            Data = value == null ? null : JToken.FromObject(value);
+            //Data = value == null ? null : System.Text.Json.JsonSerializer.Serialize(value);
+            Data = value == null ? null : JToken.FromObject(value, JsonSerializer.CreateDefault(new JsonSerializerSettings
+            {
+                Converters = { new TypeConverter() }
+            }));
         }
 
         /// <summary>
@@ -32,6 +40,7 @@ namespace AppDash.Core
         /// <returns></returns>
         public T GetData<T>()
         {
+            //return Data != null ? System.Text.Json.JsonSerializer.Deserialize<T>(Data) : default;
             return Data != null ? Data.ToObject<T>() : default;
         }
 

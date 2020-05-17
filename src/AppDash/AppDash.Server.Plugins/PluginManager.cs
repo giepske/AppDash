@@ -5,10 +5,12 @@ using System.Linq;
 using System.Reflection;
 using System.Text.Json;
 using AppDash.Plugins;
+using AppDash.Plugins.Settings;
 using AppDash.Plugins.Tiles;
+using AppDash.Server.Core.Data;
+using AppDash.Server.Core.Domain.Plugins;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
-using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace AppDash.Server.Plugins
 {
@@ -67,7 +69,24 @@ namespace AppDash.Server.Plugins
                 _serviceCollection.AddSingleton(typeof(AppDashPlugin), serviceProvider => serviceProvider.GetService(pluginType));
 
                 LoadPluginTiles(pluginKey, pluginType, assembly);
+                LoadPluginSettings(pluginKey, pluginType, assembly);
             }
+        }
+
+        private void LoadPluginSettings(string pluginKey, Type pluginType, Assembly assembly)
+        {
+            var pluginSettingsType = assembly.GetTypes().FirstOrDefault(type =>
+                (type.BaseType?.IsGenericType ?? false) &&
+                type.BaseType.GetGenericTypeDefinition() == typeof(Settings<,>) &&
+                type.BaseType?.GenericTypeArguments.FirstOrDefault() == pluginType);
+
+            //this plugin doesn't have a settings page.
+            if (pluginSettingsType == null)
+                return;
+
+            _serviceCollection.AddSingleton(typeof(ISettings), pluginSettingsType);
+
+            _pluginResolver.AddPluginSettings(pluginKey, pluginSettingsType);
         }
 
         private void LoadPluginTiles(string pluginKey, Type pluginType, Assembly assembly)
@@ -99,17 +118,70 @@ namespace AppDash.Server.Plugins
 
         public void InitializePlugins()
         {
+            var pluginRepository = _serviceProvider.GetService<IRepository<Plugin>>();
+
             List<AppDashPlugin> pluginInstances = _serviceProvider.GetServices<AppDashPlugin>().ToList();
 
-            foreach (KeyValuePair<string, Type> plugin in _pluginResolver.GetPlugins())
+            foreach (KeyValuePair<string, Type> plugin in _pluginResolver.GetPlugins().ToList())
             {
                 AppDashPlugin pluginInstance =
                     pluginInstances.First(pluginInstance1 => pluginInstance1.GetType() == plugin.Value);
 
-                pluginInstance.Key = plugin.Key;
+                var pluginData =
+                    pluginRepository.TableNoTracking.FirstOrDefault(e => e.UniqueIdentifier == plugin.Value.FullName);
+
+                if (pluginData == null)
+                {
+                    pluginData = new Plugin
+                    {
+                        UniqueIdentifier = pluginInstance.GetType().FullName,
+                        Key = _pluginResolver.GetPluginKey(pluginInstance),
+                        Name = pluginInstance.Name
+                    };
+
+                    pluginRepository.Insert(pluginData);
+                }
+                else
+                {
+                    _pluginResolver.SetPluginKey(plugin.Key, pluginData.Key);
+                }
+
+                pluginInstance.Key = pluginData.Key;
 
                 InitializePluginTiles(pluginInstance.Key);
+                InitializePluginSettings(pluginInstance.Key);
             }
+        }
+
+        private void InitializePluginSettings(string pluginKey)
+        {
+            var pluginSettingsInstances = _serviceProvider.GetServices<ISettings>().ToList();
+
+            var pluginSettings = _pluginResolver.GetPluginSettings(pluginKey);
+
+            //this plugin doesn't have a settings page.
+            if (pluginSettings == null)
+                return;
+
+            ISettings pluginSettingsInstance =
+                pluginSettingsInstances.First(pluginTileInstance1 => pluginTileInstance1.GetType() == pluginSettings);
+
+            var initializeMethod = pluginSettingsInstance.GetType().BaseType?.GetMethod("Initialize", 
+                BindingFlags.NonPublic | BindingFlags.Instance);
+
+            if (initializeMethod != null)
+            {
+                object?[]? dependencies = initializeMethod.GetParameters()
+                    .Select(parameter =>
+                    {
+                        return _serviceProvider.GetService(parameter.ParameterType);
+                    })
+                    .ToArray();
+
+                initializeMethod.Invoke(pluginSettingsInstance, dependencies);
+            }
+
+            pluginSettingsInstance.OnAfterLoad().Wait();
         }
 
         public void InitializePluginTiles(string pluginKey)
@@ -144,6 +216,42 @@ namespace AppDash.Server.Plugins
         public IEnumerable<ITile> GetTiles()
         {
             return _serviceProvider.GetService<List<ITile>>();
+        }
+
+        public PluginData GetPluginSettings(string pluginKey)
+        {
+            var settingsType = _pluginResolver.GetPluginSettings(pluginKey);
+
+            if (settingsType == null)
+                return null;
+
+            var settingsList = _serviceProvider.GetServices<ISettings>().ToList();
+
+            var settings = settingsList.FirstOrDefault(settings => settings.GetType() == settingsType);
+
+            return settings?.SettingsData;
+        }
+
+        public void SetPluginSettings(string pluginKey, PluginData pluginData)
+        {
+            var settingsType = _pluginResolver.GetPluginSettings(pluginKey);
+
+            var settingsList = _serviceProvider.GetServices<ISettings>().ToList();
+
+            var settings = settingsList.FirstOrDefault(settings => settings.GetType() == settingsType);
+
+            settings.SettingsData.Data = pluginData.Data;
+
+            var pluginSettingsRepository = _serviceProvider.GetService<IRepository<PluginSettings>>();
+
+            var pluginSettings = pluginSettingsRepository.Table.FirstOrDefault(pluginSettings => pluginSettings.PluginKey == pluginKey);
+
+            pluginSettings.Data = System.Text.Json.JsonSerializer.Serialize(pluginData, new JsonSerializerOptions
+            {
+                Converters = { new PluginDataConverter() }
+            });
+
+            pluginSettingsRepository.Update(pluginSettings);
         }
     }
 }

@@ -7,7 +7,7 @@ namespace AppDash.Server.Data
 {
     public class Repository<TEntity> : IRepository<TEntity> where TEntity : BaseEntity
     {
-        private readonly DbContext _context;
+        private readonly AppDashContext _context;
 
         private DbSet<TEntity> _entities;
 
@@ -16,7 +16,7 @@ namespace AppDash.Server.Data
 
         protected virtual DbSet<TEntity> Entities => _entities ??= _context.Set<TEntity>();
 
-        public Repository(DbContext context)
+        public Repository(AppDashContext context)
         {
             _context = context;
         }

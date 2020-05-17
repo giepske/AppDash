@@ -23,6 +23,8 @@
     {
         PluginLoader.OnPluginLoadStart = OnPluginLoadStart;
         PluginLoader.OnTilesLoadStart = OnTilesLoadStart;;
+        PluginLoader.OnPagesLoadStart = OnPagesLoadStart;;
+        PluginLoader.OnSettingsLoadStart = OnSettingsLoadStart;;
 
         await PluginLoader.LoadPlugins();
 
@@ -50,6 +52,20 @@
     private void OnTilesLoadStart(Assembly assembly)
     {
         _text = $"Loading tiles from {assembly.GetName().Name}...";
+
+        StateHasChanged();
+    }
+
+    private void OnPagesLoadStart(Assembly assembly)
+    {
+        _text = $"Loading pages from {assembly.GetName().Name}...";
+
+        StateHasChanged();
+    }
+
+    private void OnSettingsLoadStart(Assembly assembly)
+    {
+        _text = $"Loading settings from {assembly.GetName().Name}...";
 
         StateHasChanged();
     }

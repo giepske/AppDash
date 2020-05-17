@@ -1,0 +1,28 @@
+﻿@page "/settings/plugins"
+
+@using AppDash.Client.Plugins
+@using AppDash.Plugins.Settings
+
+@inject SettingsManager SettingsManager
+@inject PluginResolver PluginResolver
+
+<div class="container">
+    <List>
+        @foreach (var settingsComponent in _settingsComponents)
+        {
+            var plugin = PluginResolver.GetPlugin(settingsComponent.Key);
+            <ListItem Link="true" Page="@($"settings/plugins/{settingsComponent.Key}")">
+                @plugin.Name
+            </ListItem>
+        }
+    </List>
+</div>
+
+@code {
+    private List<KeyValuePair<string, SettingsComponent>> _settingsComponents;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _settingsComponents = (await SettingsManager.GetSettings()).ToList();
+    }
+}

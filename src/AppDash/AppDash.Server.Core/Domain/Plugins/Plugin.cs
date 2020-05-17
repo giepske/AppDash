@@ -5,7 +5,8 @@ namespace AppDash.Server.Core.Domain.Plugins
 {
     public class Plugin : BaseEntity
     {
-        public Guid Key { get; set; }
+        public string UniqueIdentifier { get; set; }
+        public string Key { get; set; }
         public string Name { get; set; }
         public bool Enabled { get; set; }
         //public List<PluginRolePermission> PluginRolePermissions { get; set; }

@@ -18,7 +18,7 @@ namespace AppDash.Plugins.Pages
         public abstract bool IsMainPage { get; set; }
 
         /// <summary>
-        /// Will be called when data is received, when the tile is first shown or when it receives updated data.
+        /// Will be called when data is received, when the page is first shown or when it receives updated data.
         /// <para>
         /// After this method is executed, <see cref="ComponentBase.StateHasChanged()"/> will be called if the return value is <see langword="true"/>.
         /// </para>

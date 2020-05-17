@@ -33,6 +33,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AppDash.Client.Plugins", "A
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AppDash.Client", "AppDash.Client\AppDash.Client.csproj", "{D4166525-CCB4-473C-8F0B-D232B8A58744}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MinecraftPlugin", "Plugins\MinecraftPlugin\MinecraftPlugin.csproj", "{AD92EC0B-8F29-48E7-96C5-71744C9FDA4E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -95,6 +97,10 @@ Global
 		{D4166525-CCB4-473C-8F0B-D232B8A58744}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D4166525-CCB4-473C-8F0B-D232B8A58744}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D4166525-CCB4-473C-8F0B-D232B8A58744}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AD92EC0B-8F29-48E7-96C5-71744C9FDA4E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AD92EC0B-8F29-48E7-96C5-71744C9FDA4E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AD92EC0B-8F29-48E7-96C5-71744C9FDA4E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AD92EC0B-8F29-48E7-96C5-71744C9FDA4E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -104,6 +110,7 @@ Global
 		{96E5E9EE-6A1E-4E7A-AD46-4FAA813A79C4} = {E1CC3FFE-060C-45D7-9AC3-BD193F60E3D6}
 		{F94DDCFE-CB7C-4B3E-AECB-CE9C9EDE55F6} = {E1CC3FFE-060C-45D7-9AC3-BD193F60E3D6}
 		{D42319D2-60F8-4079-A3EC-1B3703BBB72F} = {E1CC3FFE-060C-45D7-9AC3-BD193F60E3D6}
+		{AD92EC0B-8F29-48E7-96C5-71744C9FDA4E} = {E1CC3FFE-060C-45D7-9AC3-BD193F60E3D6}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {83CEC82D-1C8F-49E2-B968-1251B482F1EE}

@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using AppDash.Core;
 using AppDash.Plugins;
 using AppDash.Plugins.Pages;
+using AppDash.Plugins.Settings;
 using AppDash.Plugins.Tiles;
 using Microsoft.AspNetCore.Components;
 using Newtonsoft.Json.Linq;
@@ -24,6 +25,7 @@ namespace AppDash.Client.Plugins
         private readonly TileManager _tileManager;
         private readonly NavigationManager _navigationManager;
         private readonly PageManager _pageManager;
+        private readonly SettingsManager _settingsManager;
 
         /// <summary>
         /// This can be called when <see cref="LoadPlugins"/> is called. Fired when a plugin gets downloaded/loaded.
@@ -49,13 +51,22 @@ namespace AppDash.Client.Plugins
         /// </summary>
         public Action<Assembly> OnPagesLoadStart;
 
-        public PluginLoader(HttpClient httpClient, PluginManager pluginManager, TileManager tileManager, NavigationManager navigationManager, PageManager pageManager)
+        /// <summary>
+        /// This can be called when <see cref="LoadPlugins"/> is called. Fired when settings gets loaded from an assembly.
+        /// <para>
+        /// <see cref="Assembly"/> will be the assembly that is being loaded.
+        /// </para>
+        /// </summary>
+        public Action<Assembly> OnSettingsLoadStart;
+
+        public PluginLoader(HttpClient httpClient, PluginManager pluginManager, TileManager tileManager, NavigationManager navigationManager, PageManager pageManager, SettingsManager settingsManager)
         {
             _httpClient = httpClient;
             _pluginManager = pluginManager;
             _tileManager = tileManager;
             _navigationManager = navigationManager;
             _pageManager = pageManager;
+            _settingsManager = settingsManager;
         }
 
         /// <summary>
@@ -70,12 +81,13 @@ namespace AppDash.Client.Plugins
             await _pluginManager.PluginLock.WaitAsync();
             await _tileManager.TileLock.WaitAsync();
             await _pageManager.PageLock.WaitAsync();
+            await _settingsManager.SettingsLock.WaitAsync();
 
             //download and load plugins
             try
             {
                 ApiResult result =
-                    await _httpClient.GetJsonAsync<ApiResult>(_navigationManager.BaseUri + "api/plugins");
+                    await _httpClient.GetJson<ApiResult>(_navigationManager.BaseUri + "api/plugins");
                 var plugins = result.GetData<JArray>();
 
                 var assemblies = plugins.Select(plugin => plugin["assembly"]?["url"]?.Value<string>())
@@ -113,6 +125,7 @@ namespace AppDash.Client.Plugins
 
             await LoadTiles();
             await LoadPages();
+            await LoadSettings();
         }
 
         private async Task LoadTiles()
@@ -207,6 +220,54 @@ namespace AppDash.Client.Plugins
             }
 
             Console.WriteLine($"Loaded {(await _pageManager.GetPages()).Count()} pages");
+        }
+
+        private async Task LoadSettings()
+        {
+            //load settings from plugins
+            try
+            {
+                List<SettingsComponent> settings = new List<SettingsComponent>();
+
+                foreach (var assembly in await _pluginManager.GetAssemblies())
+                {
+                    OnSettingsLoadStart?.Invoke(assembly);
+
+                    try
+                    {
+                        settings.AddRange(_settingsManager.LoadSettings(assembly));
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine(e);
+                    }
+                }
+
+                foreach (SettingsComponent settingsComponent in settings)
+                {
+                    //TODO this doesnt do anything yet, just like the method below. FIX!
+                }
+
+                try
+                {
+                    _settingsManager.InitializeSettings();
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
+            finally
+            {
+                _settingsManager.SettingsLock.Release();
+            }
+
+            Console.WriteLine($"Loaded {(await _settingsManager.GetSettings()).Count()} settings");
         }
     }
 }

@@ -6,12 +6,18 @@
     height: 100%;
     transition: 1s all;
     z-index: 1;
+    display: flex;
+    flex-direction: column;
 }
 
 .navmenu:hover {
     position: absolute;
     width: 250px;
     transition: 1s all;
+}
+
+.navmenu-bottom {
+    margin-top: auto;
 }
 
 .navmenu-item {
@@ -37,6 +43,7 @@
     flex-shrink: 0;
     width: 24px;
     height: 24px;
+    font-size: 24px;
 }
 
 .navmenu-item-text {

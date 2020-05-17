@@ -2,6 +2,8 @@ using System;
 using AppDash.Core;
 using AppDash.Plugins;
 using AppDash.Server.Core.Communication;
+using AppDash.Server.Core.Data;
+using AppDash.Server.Core.Domain.Plugins;
 using AppDash.Server.Core.Domain.Roles;
 using AppDash.Server.Core.Domain.Users;
 using AppDash.Server.Data;
@@ -36,6 +38,8 @@ namespace AppDash.Server
             services.AddServices();
 
             services.AddDbContext<AppDashContext>();
+
+            services.AddRepositories();
 
             services.AddIdentity<User, Role>()
                 .AddEntityFrameworkStores<AppDashContext>();

@@ -10,11 +10,12 @@ namespace AppDash.Server.Core.Domain.Roles
         public string Color { get; set; }
         public int Index { get; set; }
 
-        public Role(string name, Permissions permissions, bool canBeModified = true)
+        public Role(string name, Permissions permissions, string color, bool canBeModified = true)
         {
             CanBeModified = canBeModified;
             base.Name = name;
             Permissions = permissions;
+            Color = color;
         }
 
         public Role() { }

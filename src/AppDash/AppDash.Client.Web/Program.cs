@@ -17,6 +17,8 @@ namespace AppDash.Client.Web
             builder.Services.AddSingleton<PluginManager>();
             builder.Services.AddSingleton<PageResolver>();
             builder.Services.AddSingleton<PageManager>();
+            builder.Services.AddSingleton<SettingsResolver>();
+            builder.Services.AddSingleton<SettingsManager>();
             builder.Services.AddSingleton<TileResolver>();
             builder.Services.AddSingleton<TileManager>();
             builder.Services.AddSingleton<PluginResolver>();

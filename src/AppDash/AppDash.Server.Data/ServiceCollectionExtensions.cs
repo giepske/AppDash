@@ -1,4 +1,5 @@
 ﻿using AppDash.Server.Core.Data;
+using AppDash.Server.Core.Domain.Plugins;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace AppDash.Server.Data

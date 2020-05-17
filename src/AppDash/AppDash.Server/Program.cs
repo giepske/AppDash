@@ -1,3 +1,4 @@
+using AppDash.Server.Data;
 using AppDash.Server.Plugins;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
@@ -10,6 +11,7 @@ namespace AppDash.Server
         {
             CreateHostBuilder(args)
                 .Build()
+                .EnsureDatabaseExists()
                 .LoadPlugins()
                 .Run();
         }

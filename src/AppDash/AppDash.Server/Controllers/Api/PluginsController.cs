@@ -1,7 +1,10 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using AppDash.Core;
+using AppDash.Plugins;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using PluginManager = AppDash.Server.Plugins.PluginManager;
 
 namespace AppDash.Server.Controllers.Api
@@ -42,6 +45,29 @@ namespace AppDash.Server.Controllers.Api
                     }
                 };
             }));
+        }
+
+        [HttpGet]
+        [Route("{pluginKey}/settings")]
+        public ApiResult GetSettings(string pluginKey)
+        {
+            var settings = _pluginManager.GetPluginSettings(pluginKey);
+
+            Console.WriteLine(JsonConvert.SerializeObject(settings));
+
+            if(settings == null)
+                return ApiResult.BadRequest();
+
+            return ApiResult.Success(settings);
+        }
+
+        [HttpPatch]
+        [Route("{pluginKey}/settings")]
+        public ApiResult SetSettings(string pluginKey, [FromBody] PluginData pluginSettings)
+        {
+            _pluginManager.SetPluginSettings(pluginKey, pluginSettings);
+
+            return ApiResult.NoContent();
         }
     }
 }

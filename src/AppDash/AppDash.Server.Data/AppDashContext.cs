@@ -2,12 +2,15 @@
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using AppDash.Server.Core.Domain.Roles;
+using AppDash.Server.Core.Domain.Users;
 using AppDash.Server.Data.Mapping;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace AppDash.Server.Data
 {
-    public class AppDashContext : DbContext
+    public class AppDashContext : IdentityDbContext<User, Role, int>
     {
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

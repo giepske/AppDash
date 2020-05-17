@@ -28,9 +28,9 @@ namespace AppDash.Client.Plugins
             return _plugins;
         }
 
-        public AppDashPlugin GetPlugin(string key)
+        public AppDashPlugin GetPlugin(string pluginKey)
         {
-            return _plugins[key];
+            return _plugins.Values.FirstOrDefault(plugin => plugin.Key == pluginKey);
         }
 
         public void ClearPlugins()

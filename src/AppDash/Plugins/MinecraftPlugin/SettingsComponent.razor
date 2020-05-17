@@ -1,0 +1,33 @@
+﻿@inherits AppDash.Plugins.Settings.SettingsComponent
+
+<div class="my-component">
+    A settings component from MinecraftPlugin.
+</div>
+@if (SettingsData != null)
+{
+    @foreach (var data in SettingsData.Data)
+    {
+        <span>@data.Key</span>
+    }
+}
+<button @onclick="@(async () => await Test())">test</button>
+
+@code
+{
+    protected override void OnInitialized()
+    {
+        Console.WriteLine("OnInitializedAsync " + SettingsData);
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        Console.WriteLine("OnAfterRender " + SettingsData);
+    }
+
+    private async Task Test()
+    {
+        SettingsData.SetData("test", "test123");
+
+        await SaveSettingsData();
+    }
+}

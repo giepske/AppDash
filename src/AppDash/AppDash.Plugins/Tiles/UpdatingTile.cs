@@ -25,6 +25,10 @@ namespace AppDash.Plugins.Tiles
 
         private void Callback(object state)
         {
+            //dont run callback if dependencies are not yet set.
+            if (_hubContext == null)
+                return;
+
             var pluginData = OnUpdateDataRequest().Result;
 
             if (pluginData != null)

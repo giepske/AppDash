@@ -13,6 +13,16 @@
                          Page="@(plugin.Item2?.RelativePath != null ? $"/plugin/{plugin.Item1.Key}/{plugin.Item2.RelativePath}" : null)">
             </NavMenuItem>
         }
+
+        <div class="navmenu-bottom">
+            <NavMenuItem Text="Plugin Settings" FontAwesomeIcon="fas fa-cogs" 
+                         Page="settings/plugins" IsBottom="true">
+            </NavMenuItem>
+
+            <NavMenuItem Text="Settings" FontAwesomeIcon="fas fa-cog" 
+                         Page="settings" IsBottom="true">
+            </NavMenuItem>
+        </div>
     }
 </div>
 
