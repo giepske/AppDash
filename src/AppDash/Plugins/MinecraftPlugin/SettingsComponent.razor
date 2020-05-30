@@ -1,33 +1,116 @@
-﻿@inherits AppDash.Plugins.Settings.SettingsComponent
+﻿@using AppDash.Core
+@using Newtonsoft.Json.Linq
+@inherits AppDash.Plugins.Settings.PluginSettingsComponent
 
-<div class="my-component">
-    A settings component from MinecraftPlugin.
-</div>
-@if (SettingsData != null)
-{
-    @foreach (var data in SettingsData.Data)
+@inject NavigationManager NavigationManager
+
+<FormGroup>
+    <Input Title="Server IP" Text="Fill in your server IP or address below." Value="@_host" OnChange="@(value => OnHostChange(value))" />
+</FormGroup>
+
+<FormGroup>
+    <Input Type="number" Title="Port" Text="Optionally fill in the port your server is using (25565 by default)." Value="@(_port ?? 22565)" OnChange="@(value => OnPortChange(value))" />
+</FormGroup>
+
+<FormGroup>
+    <Button Text="Test connection" Disabled="@(!IsValidInput())" OnClick="@(async () => await TestConnection())"></Button>
+    @if (!string.IsNullOrEmpty(_testConnectionError))
     {
-        <span>@data.Key</span>
+        <span class="text-danger">@_testConnectionError</span>
     }
-}
-<button @onclick="@(async () => await Test())">test</button>
+    else if (!string.IsNullOrEmpty(_testConnectionSuccess))
+    {
+        <span class="text-success">@_testConnectionSuccess</span>
+    }
+</FormGroup>
+
+<FormGroup>
+    <Button Text="Save" Disabled="@(!IsValidInput() || string.IsNullOrEmpty(_testConnectionSuccess))" OnClick="@(async () => await Save())"></Button>
+</FormGroup>
 
 @code
 {
-    protected override void OnInitialized()
-    {
-        Console.WriteLine("OnInitializedAsync " + SettingsData);
-    }
+        private string _host;
+        private int? _port;
 
-    protected override void OnAfterRender(bool firstRender)
-    {
-        Console.WriteLine("OnAfterRender " + SettingsData);
-    }
+        private string _testConnectionError;
+        private string _testConnectionSuccess;
 
-    private async Task Test()
-    {
-        SettingsData.SetData("test", "test123");
+        public override Task Initialize()
+        {
+            _host = SettingsData.GetData<string>("Host");
+            _port = SettingsData.GetData<int>("Port");
 
-        await SaveSettingsData();
+            if (_port == 0)
+                _port = 25565;
+
+            return Task.CompletedTask;
+        }
+
+        private async Task TestConnection()
+        {
+            if (!IsValidInput())
+                return;
+
+            var result = await HttpClient.PostJson<JObject>(NavigationManager.BaseUri + $"api/plugins/{PluginKey}/test", new Server
+            {
+                Host = _host,
+                Port = _port.Value
+            });
+
+            var statusResponse = result["statusResponse"]?.ToObject<MinecraftServerHelper.StatusResponse>();
+
+            if (result["isSuccess"]?.Value<bool>() ?? false)
+            {
+                _testConnectionSuccess = $"Got response from the server! Server version: {statusResponse.Version.Name}";
+                _testConnectionError = null;
+            }
+            else
+            {
+                _testConnectionError = $"Unable to get a valid response from the server, make sure the host and port is correct.";
+                _testConnectionSuccess = null;
+            }
+
+            StateHasChanged();
+        }
+
+        private async Task Save()
+        {
+            if (!IsValidInput())
+                return;
+
+            SettingsData.SetData("Host", _host);
+            SettingsData.SetData("Port", _port);
+
+            await SaveSettingsData();
+        }
+
+        private Task OnHostChange(string value)
+        {
+            _host = value;
+
+            StateHasChanged();
+
+            return Task.CompletedTask;
+        }
+
+        private Task OnPortChange(string value)
+        {
+            _port = int.Parse(value);
+
+            StateHasChanged();
+
+            return Task.CompletedTask;
+        }
+
+        private bool IsValidInput()
+        {
+            if (string.IsNullOrEmpty(_host) || !_port.HasValue || _port.Value <= 0)
+                return false;
+
+            if (Uri.CheckHostName(_host) == UriHostNameType.Unknown)
+                return false;
+
+            return true;
+        }
     }
-}

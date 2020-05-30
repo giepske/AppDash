@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using AppDash.Client.Plugins;
@@ -26,7 +27,7 @@ namespace AppDash.Client.Web.Pages
 
         private HubConnection hubConnection;
 
-        private List<TileComponent> _components;
+        private List<PluginTileComponent> _components;
 
         protected override async Task OnInitializedAsync()
         {
@@ -39,15 +40,16 @@ namespace AppDash.Client.Web.Pages
             Console.WriteLine("Components loaded: " + _components.Count);
 
             hubConnection = new HubConnectionBuilder()
-                .WithUrl(NavigationManager.ToAbsoluteUri("/chatHub"))
+                .WithUrl(_navigationManager.ToAbsoluteUri("/chatHub"))
                 .Build();
 
             hubConnection.On<string, PluginData>("UpdateTileData", async (tileKey, pluginData) =>
             {
-                Console.WriteLine("UpdateTileData");
- 
                 var tile = await TileManager.GetTile(tileKey);
-                if (tile.OnDataReceived(pluginData))
+
+                tile.Data = pluginData;
+
+                if (tile.OnUpdate())
                     tile.StateHasChanged();
 
                 StateHasChanged();

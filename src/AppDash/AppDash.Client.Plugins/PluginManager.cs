@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using AppDash.Plugins;
+using AppDash.Plugins.Tiles;
 using Microsoft.AspNetCore.Components;
 using Newtonsoft.Json;
 
@@ -82,6 +83,23 @@ namespace AppDash.Client.Plugins
 
                 Console.WriteLine($"{plugin.Name} set key to {pluginKey}");
             }
+        }
+
+        public AppDashPlugin GetPlugin(PluginTileComponent pluginTileComponent)
+        {
+            var tileTypes = pluginTileComponent.GetType().Assembly.GetTypes()
+                .Where(type => typeof(ITile).IsAssignableFrom(type)).ToList();
+
+            if (!tileTypes.Any())
+                return null;
+
+            var pluginType = tileTypes.FirstOrDefault(tileType => tileType.BaseType?.GenericTypeArguments[1] == pluginTileComponent.GetType())
+                ?.BaseType?.GenericTypeArguments.FirstOrDefault();
+
+            if (pluginType == null)
+                return null;
+
+            return _pluginResolver.GetPlugin(pluginType);
         }
     }
 }

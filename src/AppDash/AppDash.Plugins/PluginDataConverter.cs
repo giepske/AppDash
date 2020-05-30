@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Net.Mail;
 using System.Text.Json;
 using Newtonsoft.Json;
 using JsonSerializer = System.Text.Json.JsonSerializer;
@@ -70,6 +72,16 @@ namespace AppDash.Plugins
                 string ty = reader.Value as string;
                 Type type = Type.GetType(ty);
 
+                if (type == null)
+                {
+                    type = AppDomain.CurrentDomain.GetAssemblies()
+                        .FirstOrDefault(a => !a.IsDynamic && a.GetType(ty) != null)
+                        ?.GetType(ty);
+
+                    if (type == null)
+                        throw new Exception("Unable to find type while trying to convert JSON to PluginData object: " + ty);
+                }
+
                 reader.Read();
                 reader.Read();
 
@@ -112,6 +124,16 @@ namespace AppDash.Plugins
 
                 string ty = reader.GetString();
                 Type type = Type.GetType(ty);
+
+                if (type == null)
+                {
+                    type = AppDomain.CurrentDomain.GetAssemblies()
+                        .FirstOrDefault(a => !a.IsDynamic && a.GetType(ty) != null)
+                        ?.GetType(ty);
+
+                    if(type == null)
+                        throw new Exception("Unable to find type while trying to convert JSON to PluginData object: " + ty);
+                }
 
                 reader.Read();
                 reader.Read();

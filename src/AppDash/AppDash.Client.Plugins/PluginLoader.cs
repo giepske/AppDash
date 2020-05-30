@@ -122,7 +122,7 @@ namespace AppDash.Client.Plugins
             {
                 _pluginManager.PluginLock.Release();
             }
-
+            
             await LoadTiles();
             await LoadPages();
             await LoadSettings();
@@ -133,7 +133,7 @@ namespace AppDash.Client.Plugins
             //load tiles from plugins
             try
             {
-                List<TileComponent> tiles = new List<TileComponent>();
+                List<PluginTileComponent> tiles = new List<PluginTileComponent>();
 
                 foreach (var assembly in await _pluginManager.GetAssemblies())
                 {
@@ -148,19 +148,30 @@ namespace AppDash.Client.Plugins
                         Console.WriteLine(e);
                     }
                 }
-
-                foreach (TileComponent tileComponent in tiles)
-                {
-                    //TODO this doesnt do anything yet, just like the method below. FIX!
-                }
-
+                
                 try
                 {
-                    _tileManager.InitializeTiles();
+                    await _tileManager.InitializeTiles();
                 }
                 catch (Exception e)
                 {
                     Console.WriteLine(e);
+                }
+
+                var response = await _httpClient.GetJson<ApiResult>("api/tiles");
+                var tileDataList = response.GetData<JArray>();
+
+                foreach (PluginTileComponent tileComponent in tiles)
+                {
+                    var plugin = _pluginManager.GetPlugin(tileComponent);
+
+                    var tile = tileDataList.First(tileData =>
+                        tileData["plugin"].Value<string>() == plugin.GetType().Name &&
+                        tileData["pluginTileComponent"].Value<string>() == tileComponent.GetType().Name );
+
+                    var cachedData = tile["cachedData"].ToObject<PluginData>();
+
+                    tileComponent.Data = cachedData;
                 }
             }
             catch (Exception e)
@@ -179,7 +190,7 @@ namespace AppDash.Client.Plugins
             //load pages from plugins
             try
             {
-                List<PageComponent> pages = new List<PageComponent>();
+                List<PluginPageComponent> pages = new List<PluginPageComponent>();
 
                 foreach (var assembly in await _pluginManager.GetAssemblies())
                 {
@@ -195,7 +206,7 @@ namespace AppDash.Client.Plugins
                     }
                 }
 
-                foreach (PageComponent pageComponent in pages)
+                foreach (PluginPageComponent pageComponent in pages)
                 {
                     //TODO this doesnt do anything yet, just like the method below. FIX!
                 }
@@ -227,7 +238,7 @@ namespace AppDash.Client.Plugins
             //load settings from plugins
             try
             {
-                List<SettingsComponent> settings = new List<SettingsComponent>();
+                List<PluginSettingsComponent> settings = new List<PluginSettingsComponent>();
 
                 foreach (var assembly in await _pluginManager.GetAssemblies())
                 {
@@ -243,7 +254,7 @@ namespace AppDash.Client.Plugins
                     }
                 }
 
-                foreach (SettingsComponent settingsComponent in settings)
+                foreach (PluginSettingsComponent settingsComponent in settings)
                 {
                     //TODO this doesnt do anything yet, just like the method below. FIX!
                 }

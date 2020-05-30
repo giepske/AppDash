@@ -3,7 +3,7 @@
     /// <summary>
     /// The type of page.
     /// </summary>
-    public enum PageType
+    public enum PluginPageType
     {
         /// <summary>
         /// Page contains static data that can optionally be manually refreshed.

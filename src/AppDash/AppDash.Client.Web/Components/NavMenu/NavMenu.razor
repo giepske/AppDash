@@ -27,7 +27,7 @@
 </div>
 
 @code {
-    private List<Tuple<AppDashPlugin, PageComponent>> _plugins = new List<Tuple<AppDashPlugin, PageComponent>>();
+    private List<Tuple<AppDashPlugin, PluginPageComponent>> _plugins = new List<Tuple<AppDashPlugin, PluginPageComponent>>();
 
     protected override async Task OnInitializedAsync()
     {
@@ -35,7 +35,7 @@
 
         foreach (AppDashPlugin plugin in plugins)
         {
-            _plugins.Add(new Tuple<AppDashPlugin, PageComponent>(plugin, await PageManager.GetMainPage(plugin.GetType())));
+            _plugins.Add(new Tuple<AppDashPlugin, PluginPageComponent>(plugin, await PageManager.GetMainPage(plugin.GetType())));
         }
 
         StateHasChanged();

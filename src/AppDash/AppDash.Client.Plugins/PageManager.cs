@@ -20,9 +20,9 @@ namespace AppDash.Client.Plugins
             PageLock = new SemaphoreSlim(1, 1);
         }
         
-        public IEnumerable<PageComponent> LoadPages(Assembly assembly)
+        public IEnumerable<PluginPageComponent> LoadPages(Assembly assembly)
         {
-            var pageTypes = assembly.GetTypes().Where(type => type.BaseType == typeof(PageComponent)).ToList();
+            var pageTypes = assembly.GetTypes().Where(type => type.BaseType == typeof(PluginPageComponent)).ToList();
 
             foreach (Type pageType in pageTypes)
             {
@@ -35,7 +35,7 @@ namespace AppDash.Client.Plugins
             //todo initialize page data
         }
 
-        public async Task<IEnumerable<PageComponent>> GetPages()
+        public async Task<IEnumerable<PluginPageComponent>> GetPages()
         {
             await PageLock.WaitAsync();
 
@@ -46,7 +46,7 @@ namespace AppDash.Client.Plugins
             return pages;
         }
 
-        public async Task<PageComponent> GetPage(string pageKey)
+        public async Task<PluginPageComponent> GetPage(string pageKey)
         {
             await PageLock.WaitAsync();
 
@@ -57,7 +57,7 @@ namespace AppDash.Client.Plugins
             return page;
         }
 
-        public async Task SetPage(PageComponent component)
+        public async Task SetPage(PluginPageComponent component)
         {
             await PageLock.WaitAsync();
 
@@ -66,7 +66,7 @@ namespace AppDash.Client.Plugins
             PageLock.Release();
         }
 
-        public async Task<PageComponent> GetMainPage(Type pluginType)
+        public async Task<PluginPageComponent> GetMainPage(Type pluginType)
         {
             await PageLock.WaitAsync();
 

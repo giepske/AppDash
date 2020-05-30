@@ -5,11 +5,12 @@ namespace AppDash.Plugins.Tiles
 {
     public interface ITile
     {
-        TileType TileType { get; }
+        PluginTileType PluginTileType { get; }
         bool Refreshable { get; }
         string Url { get; }
         TimeSpan UpdateInterval { get; }
         PluginData CachedData { get; }
+        PluginData PluginSettings { get; }
 
         /// <summary>
         /// Will be called after the plugin gets loaded.

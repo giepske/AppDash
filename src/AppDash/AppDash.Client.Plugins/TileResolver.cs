@@ -6,28 +6,28 @@ namespace AppDash.Client.Plugins
 {
     public class TileResolver
     {
-        private Dictionary<string, TileComponent> _tiles;
+        private Dictionary<string, PluginTileComponent> _tiles;
 
         public TileResolver()
         {
-            _tiles = new Dictionary<string, TileComponent>();
+            _tiles = new Dictionary<string, PluginTileComponent>();
         }
 
-        public TileComponent AddTile(Type tileType)
+        public PluginTileComponent AddTile(Type tileType)
         {
-            var tileInstance = (TileComponent) Activator.CreateInstance(tileType);
+            var tileInstance = (PluginTileComponent) Activator.CreateInstance(tileType);
 
             _tiles[tileType.FullName] = tileInstance;
 
             return tileInstance;
         }
 
-        public Dictionary<string, TileComponent> GetTiles()
+        public Dictionary<string, PluginTileComponent> GetTiles()
         {
             return _tiles;
         }
 
-        public TileComponent GetTile(string key)
+        public PluginTileComponent GetTile(string key)
         {
             return _tiles[key];
         }
@@ -37,8 +37,21 @@ namespace AppDash.Client.Plugins
             _tiles.Clear();
         }
 
-        public void SetTile(TileComponent component)
+        public void SetTile(PluginTileComponent component)
         {
+            if (_tiles.ContainsKey(component.GetType().FullName))
+            {
+                var oldComponent = _tiles[component.GetType().FullName];
+
+                component.PluginKey = oldComponent.PluginKey;
+                component.PluginSettings = oldComponent.PluginSettings;
+                component.Data = oldComponent.Data;
+
+                Console.WriteLine("PluginKey: " + component.PluginKey);
+                Console.WriteLine("PluginSettings: " + component.PluginSettings);
+                Console.WriteLine("Data: " + component.Data);
+            }
+
             _tiles[component.GetType().FullName] = component;
         }
     }

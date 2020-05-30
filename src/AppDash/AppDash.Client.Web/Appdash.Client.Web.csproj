@@ -16,6 +16,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\AppDash.Client.Plugins\AppDash.Client.Plugins.csproj" />
+    <ProjectReference Include="..\AppDash.Components\AppDash.Components.csproj" />
     <ProjectReference Include="..\AppDash.Core\AppDash.Core.csproj" />
     <ProjectReference Include="..\AppDash.Plugins\AppDash.Plugins.csproj" />
   </ItemGroup>

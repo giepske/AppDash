@@ -22,7 +22,7 @@
     [Parameter]
     public string Page { get; set; }
 
-    private PageComponent _pageComponent;
+    private PluginPageComponent _pageComponent;
 
     protected override async Task OnInitializedAsync()
     {
@@ -39,7 +39,7 @@
             builder.AddComponentReferenceCapture(1, inst =>
             {
                 component = (ComponentBase)inst;
-                if(component is PageComponent pageComponent)
+                if(component is PluginPageComponent pageComponent)
                     PageManager.SetPage(pageComponent);
             });
             builder.CloseComponent();

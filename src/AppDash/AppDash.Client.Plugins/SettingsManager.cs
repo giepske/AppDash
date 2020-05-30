@@ -24,9 +24,9 @@ namespace AppDash.Client.Plugins
             SettingsLock = new SemaphoreSlim(1, 1);
         }
         
-        public IEnumerable<SettingsComponent> LoadSettings(Assembly assembly)
+        public IEnumerable<PluginSettingsComponent> LoadSettings(Assembly assembly)
         {
-            var settingsTypes = assembly.GetTypes().Where(type => type.BaseType == typeof(SettingsComponent)).ToList();
+            var settingsTypes = assembly.GetTypes().Where(type => type.BaseType == typeof(PluginSettingsComponent)).ToList();
 
             foreach (Type settingsType in settingsTypes)
             {
@@ -39,7 +39,7 @@ namespace AppDash.Client.Plugins
             //todo initialize settings data
         }
 
-        public async Task<Dictionary<string, SettingsComponent>> GetSettings()
+        public async Task<Dictionary<string, PluginSettingsComponent>> GetSettings()
         {
             await SettingsLock.WaitAsync();
 
@@ -50,7 +50,7 @@ namespace AppDash.Client.Plugins
             return settings;
         }
 
-        public async Task<SettingsComponent> GetSettings(string settingsKey)
+        public async Task<PluginSettingsComponent> GetSettings(string settingsKey)
         {
             await SettingsLock.WaitAsync();
 
@@ -61,18 +61,13 @@ namespace AppDash.Client.Plugins
             return settings;
         }
 
-        public async Task SetSettings(string pluginKey, SettingsComponent component)
+        public async Task SetSettings(string pluginKey, PluginSettingsComponent component)
         {
             await SettingsLock.WaitAsync();
 
             await _settingsResolver.SetSettings(pluginKey, component);
 
             SettingsLock.Release();
-        }
-
-        public async Task<PluginData> SetSettingsData(string pluginKey)
-        {
-            return await _settingsResolver.SetSettingsData(pluginKey);
         }
     }
 }

@@ -11,31 +11,41 @@ namespace AppDash.Client.Plugins
     public class TileManager
     {
         private readonly TileResolver _tileResolver;
+        private readonly PluginManager _pluginManager;
+        private readonly PluginSettingsManager _pluginSettingsManager;
 
         public readonly SemaphoreSlim TileLock;
 
-        public TileManager(TileResolver tileResolver)
+        public TileManager(TileResolver tileResolver, PluginManager pluginManager, PluginSettingsManager pluginSettingsManager)
         {
             _tileResolver = tileResolver;
+            _pluginManager = pluginManager;
+            _pluginSettingsManager = pluginSettingsManager;
             TileLock = new SemaphoreSlim(1, 1);
         }
         
-        public IEnumerable<TileComponent> LoadTiles(Assembly assembly)
+        public IEnumerable<PluginTileComponent> LoadTiles(Assembly assembly)
         {
-            var tileTypes = assembly.GetTypes().Where(type => type.BaseType == typeof(TileComponent)).ToList();
-
+            var tileTypes = assembly.GetTypes().Where(type => type.BaseType == typeof(PluginTileComponent)).ToList();
+            
             foreach (Type tileType in tileTypes)
             {
                 yield return _tileResolver.AddTile(tileType);
             }
         }
 
-        public void InitializeTiles()
+        public async Task InitializeTiles()
         {
-            //todo initialize tile data
+            foreach (var pluginTileComponent in _tileResolver.GetTiles().Values)
+            {
+                var plugin = _pluginManager.GetPlugin(pluginTileComponent);
+
+                pluginTileComponent.PluginKey = plugin.Key;
+                pluginTileComponent.PluginSettings = await _pluginSettingsManager.GetPluginSettings(plugin.Key);
+            }
         }
 
-        public async Task<IEnumerable<TileComponent>> GetTiles()
+        public async Task<IEnumerable<PluginTileComponent>> GetTiles()
         {
             await TileLock.WaitAsync();
 
@@ -46,7 +56,7 @@ namespace AppDash.Client.Plugins
             return tiles;
         }
 
-        public async Task<TileComponent> GetTile(string tileKey)
+        public async Task<PluginTileComponent> GetTile(string tileKey)
         {
             await TileLock.WaitAsync();
 
@@ -57,7 +67,7 @@ namespace AppDash.Client.Plugins
             return tile;
         }
 
-        public async Task SetTile(TileComponent component)
+        public async Task SetTile(PluginTileComponent component)
         {
             await TileLock.WaitAsync();
 

@@ -2,6 +2,8 @@ using AppDash.Server.Data;
 using AppDash.Server.Plugins;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace AppDash.Server
 {

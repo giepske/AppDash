@@ -16,7 +16,7 @@ using PluginManager = AppDash.Server.Plugins.PluginManager;
 
 namespace AppDash.Server.Controllers
 {
-    [ApiController]
+    [Controller]
     [Route("[controller]")]
     public class PluginsController : ControllerBase
     {
@@ -82,18 +82,6 @@ namespace AppDash.Server.Controllers
             }
             
             //return _pluginManager.GetPlugins();
-        }
-
-        /// <summary>
-        /// Get current data of all visible tiles.
-        /// </summary>
-        /// <returns>Dictionary with tile type and its plugindata object.</returns>
-        [HttpGet]
-        [Route("tiles")]
-        public Dictionary<string, PluginData> GetTileData()
-        {
-            return _pluginManager.GetTiles()
-                .ToDictionary(e => e.GetType().FullName, e => e.CachedData);
         }
     }
 }

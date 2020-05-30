@@ -1,9 +1,14 @@
 ﻿using System;
 using System.Linq;
+using System.Reflection;
+using System.Threading.Tasks;
 using AppDash.Core;
 using AppDash.Plugins;
+using AppDash.Plugins.Controllers;
+using AppDash.Server.Plugins;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Routing;
 using Newtonsoft.Json;
 using PluginManager = AppDash.Server.Plugins.PluginManager;
 
@@ -14,10 +19,14 @@ namespace AppDash.Server.Controllers.Api
     public class PluginsController : ControllerBase
     {
         private readonly PluginManager _pluginManager;
+        private readonly PluginControllerMatcher _pluginControllerMatcher;
+        private readonly PluginSettingsManager _pluginSettingsManager;
 
-        public PluginsController(PluginManager pluginManager)
+        public PluginsController(PluginManager pluginManager, PluginControllerMatcher pluginControllerMatcher, PluginSettingsManager pluginSettingsManager)
         {
             _pluginManager = pluginManager;
+            _pluginControllerMatcher = pluginControllerMatcher;
+            _pluginSettingsManager = pluginSettingsManager;
         }
 
         [HttpGet]
@@ -51,9 +60,7 @@ namespace AppDash.Server.Controllers.Api
         [Route("{pluginKey}/settings")]
         public ApiResult GetSettings(string pluginKey)
         {
-            var settings = _pluginManager.GetPluginSettings(pluginKey);
-
-            Console.WriteLine(JsonConvert.SerializeObject(settings));
+            var settings = _pluginSettingsManager.GetPluginSettings(pluginKey);
 
             if(settings == null)
                 return ApiResult.BadRequest();
@@ -65,9 +72,29 @@ namespace AppDash.Server.Controllers.Api
         [Route("{pluginKey}/settings")]
         public ApiResult SetSettings(string pluginKey, [FromBody] PluginData pluginSettings)
         {
-            _pluginManager.SetPluginSettings(pluginKey, pluginSettings);
+            _pluginSettingsManager.SetPluginSettings(pluginKey, pluginSettings);
 
             return ApiResult.NoContent();
+        }
+
+        [HttpGet]
+        [HttpPost]
+        [HttpPatch]
+        [HttpDelete]
+        [HttpPut]
+        [HttpHead]
+        [HttpOptions]
+        [Route("{pluginKey}/{route}")]
+        public IActionResult ExecutePluginAction(string pluginKey, string route)
+        {
+            route = "/" + route;
+
+            if (_pluginControllerMatcher.TryMatch(pluginKey, route, out (IPluginController, MethodInfo) pluginController))
+            {
+                return _pluginControllerMatcher.Execute(pluginKey, route, Request.Body, pluginController.Item1, pluginController.Item2);
+            }
+
+            return ApiResult.NotFound();
         }
     }
 }

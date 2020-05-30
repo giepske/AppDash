@@ -5,7 +5,7 @@ namespace AppDash.Plugins.Pages
 {
     public interface IPage
     {
-        PageType PageType { get; }
+        PluginPageType PluginPageType { get; }
         bool Refreshable { get; }
         string Url { get; }
         TimeSpan UpdateInterval { get; }
@@ -28,12 +28,12 @@ namespace AppDash.Plugins.Pages
         void UpdateData(PluginData pluginData);
 
         /// <summary>
-        /// Will be called when the page needs to be updated, based on the value of <see cref="Page{TPlugin,TRazorComponent}.UpdateInterval"/>.
+        /// Will be called when the page needs to be updated, based on the value of <see cref="PluginPage{TPlugin,TRazorComponent}.UpdateInterval"/>.
         /// <para>
         /// This method will be called for you and should not be called manually.
         /// </para>
         /// <para>
-        /// This only needs to be implemented when <see cref="Page{TPlugin,TRazorComponent}.TileType"/> is <c>PageType.UpdatingContent</c>.
+        /// This only needs to be implemented when <see cref="PluginPage{TPlugin,TRazorComponent}.TileType"/> is <see cref="PluginPageType.UpdatingContent"></see>.
         /// </para>
         /// </summary>
         /// <returns>Return a PluginData object to update the page or <see langword="null"/> to not update anything.</returns>

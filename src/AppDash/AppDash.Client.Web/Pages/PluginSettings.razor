@@ -8,6 +8,7 @@
 
 
 @inject SettingsManager SettingsManager
+@inject PluginSettingsManager PluginSettingsManager
 @inject PluginResolver PluginResolver
 @inject HttpClient HttpClient
 
@@ -22,7 +23,7 @@
     [Parameter]
     public string PluginKey { get; set; }
 
-    private SettingsComponent _settingsComponent;
+    private PluginSettingsComponent _settingsComponent;
 
     private PluginData SettingsData;
     
@@ -30,13 +31,13 @@
     {
         _settingsComponent = await SettingsManager.GetSettings(PluginKey);
 
-        SettingsData = await SettingsManager.SetSettingsData(PluginKey);
+        SettingsData = await PluginSettingsManager.GetPluginSettings(PluginKey);
 
         _settingsComponent.SettingsData = SettingsData;
         _settingsComponent.HttpClient = HttpClient;
         _settingsComponent.PluginKey = PluginKey;
 
-        _settingsComponent.StateHasChanged();
+        await _settingsComponent.Initialize();
     }
 
     protected override void OnAfterRender(bool firstRender)
@@ -54,9 +55,9 @@
             builder.AddComponentReferenceCapture(1, inst =>
             {
                 component = (ComponentBase)inst;
-                if (component is SettingsComponent settingsComponent)
+                if (component is PluginSettingsComponent settingsComponent)
                 {
-                    settingsComponent.SettingsData = SettingsData;
+                    SettingsManager.SetSettings(PluginKey, settingsComponent);
 
                     _settingsComponent = settingsComponent;
 

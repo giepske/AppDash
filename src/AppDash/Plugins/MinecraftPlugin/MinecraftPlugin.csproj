@@ -3,6 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <RazorLangVersion>3.0</RazorLangVersion>
+    <LangVersion>8</LangVersion>
   </PropertyGroup>
 
 
@@ -13,6 +14,7 @@
 
 
   <ItemGroup>
+    <ProjectReference Include="..\..\AppDash.Components\AppDash.Components.csproj" />
     <ProjectReference Include="..\..\AppDash.Plugins\AppDash.Plugins.csproj" />
   </ItemGroup>
 

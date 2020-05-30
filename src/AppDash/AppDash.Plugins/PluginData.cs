@@ -18,7 +18,12 @@ namespace AppDash.Plugins
 
         public PluginData()
         {
+            Data = new Dictionary<string, Tuple<Type, object>>();
+        }
 
+        public bool RemoveKey(string key)
+        {
+            return Data.Remove(key);
         }
 
         public void SetData(string key, object data)
@@ -28,6 +33,9 @@ namespace AppDash.Plugins
 
         public T GetData<T>(string key)
         {
+            if (!Data.ContainsKey(key))
+                return default;
+
             return (T)Data[key].Item2;
         }
     }

@@ -23,6 +23,7 @@ namespace AppDash.Client.Web
             builder.Services.AddSingleton<TileManager>();
             builder.Services.AddSingleton<PluginResolver>();
             builder.Services.AddSingleton<PluginLoader>();
+            builder.Services.AddSingleton<PluginSettingsManager>();
             builder.Services.AddSingleton(new HttpClient
             {
                 BaseAddress = new Uri(builder.HostEnvironment.BaseAddress)

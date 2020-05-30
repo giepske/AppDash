@@ -21,6 +21,10 @@ namespace AppDash.Server.Plugins
         {
             serviceCollection.AddSingleton<PluginResolver>();
             serviceCollection.AddSingleton<PluginManager>();
+            serviceCollection.AddSingleton<PluginLoader>();
+            serviceCollection.AddSingleton<PluginInitializer>();
+            serviceCollection.AddSingleton<PluginControllerMatcher>();
+            serviceCollection.AddSingleton<PluginSettingsManager>();
 
             return serviceCollection;
         }

@@ -22,9 +22,9 @@
     protected override async Task OnInitializedAsync()
     {
         PluginLoader.OnPluginLoadStart = OnPluginLoadStart;
-        PluginLoader.OnTilesLoadStart = OnTilesLoadStart;;
-        PluginLoader.OnPagesLoadStart = OnPagesLoadStart;;
-        PluginLoader.OnSettingsLoadStart = OnSettingsLoadStart;;
+        PluginLoader.OnTilesLoadStart = OnTilesLoadStart;
+        PluginLoader.OnPagesLoadStart = OnPagesLoadStart;
+        PluginLoader.OnSettingsLoadStart = OnSettingsLoadStart;
 
         await PluginLoader.LoadPlugins();
 

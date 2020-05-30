@@ -1,12 +1,12 @@
 ﻿@if (Link)
 {
-    <a href="@Page" class="list-item @(Link ? "list-item-link" : "")">
+    <a href="@Page" class="list-item list-item-link @Class">
         @ChildContent
     </a>
 }
 else
 {
-    <div class="list-item @(Link ? "list-item-link" : "")">
+    <div class="list-item @Class">
         @ChildContent
     </div>
 }
@@ -20,4 +20,8 @@ else
 
     [Parameter]
     public string Page { get; set; }
+
+    [Parameter]
+    public string Class { get; set; } = "";
+
 }
