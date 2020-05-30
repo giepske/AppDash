@@ -1,0 +1,72 @@
+﻿@page "/settings/plugins/{pluginKey}"
+
+@using AppDash.Client.Plugins
+@using AppDash.Core
+@using AppDash.Plugins
+@using AppDash.Plugins.Settings
+@using Newtonsoft.Json
+
+
+@inject SettingsManager SettingsManager
+@inject PluginSettingsManager PluginSettingsManager
+@inject PluginResolver PluginResolver
+@inject HttpClient HttpClient
+
+<div class="container">
+    @if (!string.IsNullOrEmpty(PluginKey) && _settingsComponent != null)
+    {
+        @RenderComponent(_settingsComponent)
+    }
+</div>
+
+@code {
+    [Parameter]
+    public string PluginKey { get; set; }
+
+    private PluginSettingsComponent _settingsComponent;
+
+    private PluginData SettingsData;
+    
+    protected override async Task OnInitializedAsync()
+    {
+        _settingsComponent = await SettingsManager.GetSettings(PluginKey);
+
+        SettingsData = await PluginSettingsManager.GetPluginSettings(PluginKey);
+
+        _settingsComponent.SettingsData = SettingsData;
+        _settingsComponent.HttpClient = HttpClient;
+        _settingsComponent.PluginKey = PluginKey;
+
+        await _settingsComponent.Initialize();
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        Console.WriteLine("_settingsComponent.SettingsData " + JsonConvert.SerializeObject(_settingsComponent.SettingsData));
+        Console.WriteLine("_settingsComponent.HttpClient " + _settingsComponent.HttpClient);
+        Console.WriteLine("_settingsComponent.PluginKey " + _settingsComponent.PluginKey);
+    }
+
+    RenderFragment RenderComponent(ComponentBase component)
+    {
+        return builder =>
+        {
+            builder.OpenComponent(0, component.GetType());
+            builder.AddComponentReferenceCapture(1, inst =>
+            {
+                component = (ComponentBase)inst;
+                if (component is PluginSettingsComponent settingsComponent)
+                {
+                    SettingsManager.SetSettings(PluginKey, settingsComponent);
+
+                    _settingsComponent = settingsComponent;
+
+                    Console.WriteLine("settingsComponent.SettingsData " + settingsComponent.SettingsData);
+                    Console.WriteLine("settingsComponent.HttpClient " + settingsComponent.HttpClient);
+                    Console.WriteLine("settingsComponent.PluginKey " + settingsComponent.PluginKey);
+                }
+            });
+            builder.CloseComponent();
+        };
+    }
+}

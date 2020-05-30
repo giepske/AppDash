@@ -1,0 +1,16 @@
+﻿@page "/"
+@using Microsoft.AspNetCore.SignalR.Client
+@using AppDash.Plugins.Tiles
+@inject NavigationManager NavigationManager
+
+<Grid>
+    @if (_components != null)
+    {
+        @foreach (PluginTileComponent component in _components)
+        {
+            <GridItem>
+                <Tile TileComponent="component"></Tile>
+            </GridItem>
+        }
+    }
+</Grid>

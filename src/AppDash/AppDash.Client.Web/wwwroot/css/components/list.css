@@ -1,0 +1,23 @@
+﻿.list {
+    display: flex;
+}
+
+.list-item {
+    border-radius: 6px;
+    background: var(--secondary-bg-color);
+    padding: 8px;
+    margin: 1%;
+    width: 100%;
+    box-shadow: 0px 2px 3px 0px rgba(13,13,13,1);
+    transition: 1s all;
+}
+
+.list-item-link {
+    color: white;
+}
+
+.list-item-link:hover {
+    background: var(--blending-bg-color);
+    transition: 1s all;
+    cursor: pointer;
+}

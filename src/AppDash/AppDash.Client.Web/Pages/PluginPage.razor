@@ -1,0 +1,48 @@
+﻿@page "/plugin/{pluginKey}/{page}"
+
+@using AppDash.Client.Plugins
+@using AppDash.Plugins.Pages
+
+@inject PageManager PageManager
+
+<h1>Plugin page</h1>
+
+<p>PluginKey: @PluginKey</p>
+<p>Page: @Page</p>
+
+@if (_pageComponent != null)
+{
+    @RenderComponent(_pageComponent)
+}
+
+@code {
+    [Parameter]
+    public string PluginKey { get; set; }
+
+    [Parameter]
+    public string Page { get; set; }
+
+    private PluginPageComponent _pageComponent;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _pageComponent = await PageManager.GetPage(Page);
+
+        await base.OnInitializedAsync();
+    }
+
+    RenderFragment RenderComponent(ComponentBase component)
+    {
+        return builder =>
+        {
+            builder.OpenComponent(0, component.GetType());
+            builder.AddComponentReferenceCapture(1, inst =>
+            {
+                component = (ComponentBase)inst;
+                if(component is PluginPageComponent pageComponent)
+                    PageManager.SetPage(pageComponent);
+            });
+            builder.CloseComponent();
+        };
+    }
+}

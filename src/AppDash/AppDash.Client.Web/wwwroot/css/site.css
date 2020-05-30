@@ -1,0 +1,61 @@
+﻿@import url('open-iconic/font/css/open-iconic-bootstrap.min.css');
+
+html, body {
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    background-color: var(--primary-bg-color);
+    color: white;
+}
+
+.logo {
+    width: 100%;
+    text-align: center;
+}
+
+.logo-title-text-1 {
+    font-family: Tahoma, Geneva, sans-serif;
+    color: var(--primary-color);
+    font-size: 64px;
+}
+
+.logo-title-text-2 {
+    font-family: Tahoma, Geneva, sans-serif;
+    color: var(--secondary-color);
+    font-size: 64px;
+}
+
+.main {
+    display: flex;
+    position: relative;
+}
+
+.main-content {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    margin-left: 50px;
+}
+
+html, body, .main {
+    height: 100%;
+}
+
+.no-link-decoration:hover {
+    color: inherit;
+    text-decoration: none;
+}
+
+/* /settings/plugins */
+.pluginsettingslist-item {
+    display: flex;
+}
+
+.pluginsettingslist-item-icon {
+    width: 96px;
+    height: 96px;
+}
+
+.pluginsettingslist-item-text {
+    flex-direction: column;
+    display: flex;
+}
+

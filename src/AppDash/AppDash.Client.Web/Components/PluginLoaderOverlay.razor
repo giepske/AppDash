@@ -1,0 +1,72 @@
+﻿@using AppDash.Client.Plugins
+@using System.Reflection
+
+@inject PluginLoader PluginLoader
+
+<div class="pluginloaderoverlay @(_hiding ? "pluginloaderoverlay-hiding" : "") @(_hidden ? "pluginloaderoverlay-hidden" : "")">
+    <div class="pluginloaderoverlay-inner">
+        <div class="pluginloaderoverlay-info">
+            <div class="spinner-border mb-4 pluginloaderoverlay-info-spinner" role="status">
+            </div>
+            <span class="pluginloaderoverlay-info-text">@_text</span>
+        </div>
+    </div>
+</div>
+
+@code {
+    private bool _hiding = false;
+    private bool _hidden = false;
+
+    private string _text = "Loading...";
+
+    protected override async Task OnInitializedAsync()
+    {
+        PluginLoader.OnPluginLoadStart = OnPluginLoadStart;
+        PluginLoader.OnTilesLoadStart = OnTilesLoadStart;
+        PluginLoader.OnPagesLoadStart = OnPagesLoadStart;
+        PluginLoader.OnSettingsLoadStart = OnSettingsLoadStart;
+
+        await PluginLoader.LoadPlugins();
+
+        _hiding = true;
+
+        StateHasChanged();
+
+        await Task.Delay(1000);
+
+        _hiding = false;
+        _hidden = true;
+
+        StateHasChanged();
+
+        await base.OnInitializedAsync();
+    }
+
+    private void OnPluginLoadStart(string plugin)
+    {
+        _text = $"Loading plugin {plugin}...";
+
+        StateHasChanged();
+    }
+
+    private void OnTilesLoadStart(Assembly assembly)
+    {
+        _text = $"Loading tiles from {assembly.GetName().Name}...";
+
+        StateHasChanged();
+    }
+
+    private void OnPagesLoadStart(Assembly assembly)
+    {
+        _text = $"Loading pages from {assembly.GetName().Name}...";
+
+        StateHasChanged();
+    }
+
+    private void OnSettingsLoadStart(Assembly assembly)
+    {
+        _text = $"Loading settings from {assembly.GetName().Name}...";
+
+        StateHasChanged();
+    }
+}

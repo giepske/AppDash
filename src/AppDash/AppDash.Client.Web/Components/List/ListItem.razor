@@ -1,0 +1,27 @@
+﻿@if (Link)
+{
+    <a href="@Page" class="list-item list-item-link @Class">
+        @ChildContent
+    </a>
+}
+else
+{
+    <div class="list-item @Class">
+        @ChildContent
+    </div>
+}
+
+@code {
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+
+    [Parameter]
+    public bool Link { get; set; } = false;
+
+    [Parameter]
+    public string Page { get; set; }
+
+    [Parameter]
+    public string Class { get; set; } = "";
+
+}

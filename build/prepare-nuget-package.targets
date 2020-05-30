@@ -1,0 +1,15 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <!--
+  
+  This build task is run from the ModBuildConfig project after it's been compiled, and copies the
+  package files to the bin\Pathoschild.Stardew.ModBuildConfig folder.
+  
+  -->
+  <Target Name="PreparePackage" AfterTargets="AfterBuild">
+    <PropertyGroup>
+      <PackagePath>$(SolutionDir)\..\bin\Pathoschild.Stardew.ModBuildConfig</PackagePath>
+    </PropertyGroup>
+    <RemoveDir Directories="$(PackagePath)" />
+    <Copy SourceFiles="$(ProjectDir)/build/build.targets" DestinationFiles="$(PackagePath)/build/Pathoschild.Stardew.ModBuildConfig.targets" />
+  </Target>
+</Project>

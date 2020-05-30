@@ -1,0 +1,49 @@
+﻿@if (!string.IsNullOrEmpty(Page))
+{
+    <a href="@Page" class="navmenu-item-href @(IsBottom ? "mb-2 d-block" : "mt-2")">
+        <div class="navmenu-item">
+            @if (!string.IsNullOrEmpty(Icon))
+            {
+                <img class="navmenu-item-icon ml-2" src="@Icon" />
+            }
+            @if (!string.IsNullOrEmpty(FontAwesomeIcon))
+            {
+                <i class="navmenu-item-icon ml-2 @FontAwesomeIcon"></i>
+            }
+            <span class="navmenu-item-text ml-2">@Text</span>
+        </div>
+    </a>
+}
+else
+{
+    <div class="navmenu-item  mr-2 @(IsBottom ? "mb-2 d-block" : "mt-2")">
+        @if (!string.IsNullOrEmpty(Icon))
+        {
+            <img class="navmenu-item-icon ml-2" src="@Icon" />
+        }        
+        @if (!string.IsNullOrEmpty(FontAwesomeIcon))
+        {
+            <i class="navmenu-item-icon ml-2 @FontAwesomeIcon"></i>
+        }
+        <span class="navmenu-item-text ml-2">@Text</span>
+    </div>
+}
+
+
+@code {
+    [Parameter]
+    public string Text { get; set; }
+
+    [Parameter]
+    public string Icon { get; set; }
+
+    [Parameter]
+    public string FontAwesomeIcon { get; set; }
+
+    [Parameter]
+    public string Page { get; set; }
+
+    [Parameter]
+    public bool IsBottom { get; set; } = false;
+
+}
