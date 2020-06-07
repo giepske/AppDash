@@ -10,6 +10,7 @@ namespace AppDash.Server.Core.Data
 
         TEntity GetById(object id);
         TEntity Insert(TEntity entity);
+        TEntity InsertNoTracking(TEntity entity);
         void Insert(IEnumerable<TEntity> entities);
         TEntity Update(TEntity entity);
         void Update(IEnumerable<TEntity> entities);

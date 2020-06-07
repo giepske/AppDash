@@ -21,10 +21,4 @@
     <ProjectReference Include="..\AppDash.Core\AppDash.Core.csproj" />
     <ProjectReference Include="..\AppDash.Server.Core\AppDash.Server.Core.csproj" />
   </ItemGroup>
-
-  <ItemGroup>
-    <None Update="build\build.targets">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
 </Project>

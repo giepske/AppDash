@@ -10,6 +10,7 @@ namespace AppDash.Plugins.Pages
         string Url { get; }
         TimeSpan UpdateInterval { get; }
         PluginData CachedData { get; }
+        string PluginKey { get; }
 
         /// <summary>
         /// Will be called after the plugin gets loaded.

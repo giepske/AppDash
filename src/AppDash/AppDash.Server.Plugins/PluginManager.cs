@@ -1,16 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text.Json;
+﻿using System.Collections.Generic;
 using AppDash.Plugins;
 using AppDash.Plugins.Controllers;
-using AppDash.Plugins.Settings;
 using AppDash.Plugins.Tiles;
-using AppDash.Server.Core.Data;
-using AppDash.Server.Core.Domain.Plugins;
-using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace AppDash.Server.Plugins
 {
@@ -19,8 +10,6 @@ namespace AppDash.Server.Plugins
         private readonly PluginResolver _pluginResolver;
         private readonly PluginLoader _pluginLoader;
         private readonly PluginInitializer _pluginInitializer;
-
-        private IServiceProvider _serviceProvider;
 
         public PluginManager(PluginResolver pluginResolver, PluginLoader pluginLoader, PluginInitializer pluginInitializer)
         {
@@ -31,67 +20,34 @@ namespace AppDash.Server.Plugins
 
         public void LoadPlugins(string pluginPath)
         {
-            _serviceProvider = _pluginLoader.LoadPlugins(pluginPath);
+            _pluginLoader.LoadPlugins(pluginPath);
 
-            _pluginInitializer.InitializePlugins(_serviceProvider);
+            _pluginInitializer.InitializePlugins();
         }
 
-        public T GetPlugin<T>(string key)
+        public AppDashPlugin GetPluginInstance(string pluginKey)
         {
-            Type pluginType = _pluginResolver.GetPlugin(key);
-
-            return (T)_serviceProvider.GetService(pluginType);
+            return _pluginResolver.GetPluginInstance(pluginKey);
         }
 
-        public IEnumerable<AppDashPlugin> GetPlugins()
+        public IEnumerable<AppDashPlugin> GetPluginInstances()
         {
-            return _serviceProvider.GetServices<AppDashPlugin>();
+            return _pluginResolver.GetPluginInstances();
         }
 
         public IEnumerable<ITile> GetTiles()
         {
-            return _serviceProvider.GetServices<ITile>();
-        }
-
-        public PluginData GetPluginSettings(string pluginKey)
-        {
-            var settingsType = _pluginResolver.GetPluginSettings(pluginKey);
-
-            if (settingsType == null)
-                return null;
-
-            var settingsList = _serviceProvider.GetServices<ISettings>().ToList();
-
-            var settings = settingsList.FirstOrDefault(settings1 => settings1.GetType() == settingsType);
-
-            return settings?.SettingsData;
-        }
-
-        public void SetPluginSettings(string pluginKey, PluginData pluginData)
-        {
-            var settingsType = _pluginResolver.GetPluginSettings(pluginKey);
-
-            var settingsList = _serviceProvider.GetServices<ISettings>().ToList();
-
-            var settings = settingsList.FirstOrDefault(settings => settings.GetType() == settingsType);
-
-            settings.SettingsData.Data = pluginData.Data;
-
-            var pluginSettingsRepository = _serviceProvider.GetService<IRepository<PluginSettings>>();
-
-            var pluginSettings = pluginSettingsRepository.Table.FirstOrDefault(pluginSettings1 => pluginSettings1.PluginKey == pluginKey);
-
-            pluginSettings.Data = JsonSerializer.Serialize(pluginData, new JsonSerializerOptions
-            {
-                Converters = { new PluginDataConverter() }
-            });
-
-            pluginSettingsRepository.Update(pluginSettings);
+            return _pluginResolver.GetPluginTiles();
         }
 
         public IEnumerable<IPluginController> GetPluginControllers(string pluginKey)
         {
             return _pluginResolver.GetPluginControllers(pluginKey);
+        }
+
+        public IEnumerable<Plugin> GetPlugins()
+        {
+            return _pluginResolver.GetPlugins();
         }
     }
 }

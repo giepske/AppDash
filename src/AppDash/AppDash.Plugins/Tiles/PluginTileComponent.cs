@@ -18,6 +18,11 @@ namespace AppDash.Plugins.Tiles
         public string PluginKey { get; set; }
 
         /// <summary>
+        /// The tile key this tile.
+        /// </summary>
+        public string TileKey { get; set; }
+
+        /// <summary>
         /// The plugin settings of the plugin.
         /// </summary>
         public PluginData PluginSettings { get; set; }
@@ -28,7 +33,7 @@ namespace AppDash.Plugins.Tiles
         public PluginData Data { get; set; }
 
         /// <summary>
-        /// Will be called when <see cref="Data"/> is updated, after the tile is first shown or after it receives updated data.
+        /// Will be called after <see cref="Data"/> is updated, after the tile is first shown or after it receives updated data.
         /// <para>
         /// After this method is executed, <see cref="ComponentBase.StateHasChanged()"/> will be called if the return value is <see langword="true"/>.
         /// </para>

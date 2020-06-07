@@ -1,13 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using AppDash.Plugins;
-using AppDash.Plugins.Settings;
+using AppDash.Plugins.Pages;
 using AppDash.Plugins.Tiles;
-using AppDash.Server.Core.Data;
-using AppDash.Server.Core.Domain.Plugins;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace AppDash.Server.Plugins
 {
@@ -15,64 +11,32 @@ namespace AppDash.Server.Plugins
     {
         private readonly PluginResolver _pluginResolver;
         private readonly PluginSettingsManager _pluginSettingsManager;
+        private readonly IServiceProvider _serviceProvider;
 
-        public PluginInitializer(PluginResolver pluginResolver, PluginSettingsManager pluginSettingsManager)
+        public PluginInitializer(PluginResolver pluginResolver, PluginSettingsManager pluginSettingsManager, IServiceProvider serviceProvider)
         {
             _pluginResolver = pluginResolver;
             _pluginSettingsManager = pluginSettingsManager;
+            _serviceProvider = serviceProvider;
         }
 
-        public void InitializePlugins(IServiceProvider serviceProvider)
+        public void InitializePlugins()
         {
-            var pluginRepository = serviceProvider.GetService<IRepository<Plugin>>();
-
-            List<AppDashPlugin> pluginInstances = serviceProvider.GetServices<AppDashPlugin>().ToList();
-
-            foreach (KeyValuePair<string, Type> plugin in _pluginResolver.GetPlugins().ToList())
+            foreach (AppDashPlugin plugin in _pluginResolver.GetPluginInstances())
             {
-                AppDashPlugin pluginInstance =
-                    pluginInstances.First(pluginInstance1 => pluginInstance1.GetType() == plugin.Value);
-
-                var pluginData =
-                    pluginRepository.TableNoTracking.FirstOrDefault(e => e.UniqueIdentifier == plugin.Value.FullName);
-
-                if (pluginData == null)
-                {
-                    pluginData = new Plugin
-                    {
-                        UniqueIdentifier = pluginInstance.GetType().FullName,
-                        Key = _pluginResolver.GetPluginKey(pluginInstance),
-                        Name = pluginInstance.Name
-                    };
-
-                    pluginRepository.Insert(pluginData);
-                }
-                else
-                {
-                    _pluginResolver.SetPluginKey(plugin.Key, pluginData.Key);
-                }
-
-                pluginInstance.Key = pluginData.Key;
-                
-                _pluginResolver.SetServiceProvider(pluginInstance.Key, pluginInstance);
-
-                InitializePluginTiles(pluginInstance.Key, serviceProvider);
-                InitializePluginSettings(pluginInstance.Key, serviceProvider);
+                InitializePluginTiles(plugin.Key);
+                InitializePluginSettings(plugin.Key);
+                InitializePluginPages(plugin.Key);
             }
         }
 
-        private void InitializePluginSettings(string pluginKey, IServiceProvider serviceProvider)
+        private void InitializePluginSettings(string pluginKey)
         {
-            var pluginSettingsInstances = serviceProvider.GetServices<ISettings>().ToList();
-
-            var pluginSettings = _pluginResolver.GetPluginSettings(pluginKey);
+            var pluginSettingsInstance = _pluginResolver.GetSettings(pluginKey);
 
             //this plugin doesn't have a settings page.
-            if (pluginSettings == null)
+            if (pluginSettingsInstance == null)
                 return;
-
-            ISettings pluginSettingsInstance =
-                pluginSettingsInstances.First(pluginTileInstance1 => pluginTileInstance1.GetType() == pluginSettings);
 
             var initializeMethod = pluginSettingsInstance.GetType().BaseType?.GetMethod("Initialize",
                 BindingFlags.NonPublic | BindingFlags.Instance);
@@ -82,7 +46,7 @@ namespace AppDash.Server.Plugins
                 object?[]? dependencies = initializeMethod.GetParameters()
                     .Select(parameter =>
                     {
-                        return serviceProvider.GetService(parameter.ParameterType);
+                        return _serviceProvider.GetService(parameter.ParameterType);
                     })
                     .ToArray();
 
@@ -92,17 +56,12 @@ namespace AppDash.Server.Plugins
             pluginSettingsInstance.OnAfterLoad().Wait();
         }
 
-        public void InitializePluginTiles(string pluginKey, IServiceProvider serviceProvider)
+        private void InitializePluginTiles(string pluginKey)
         {
-            var pluginTileInstances = serviceProvider.GetServices<ITile>().ToList();
+            var pluginTileInstances = _pluginResolver.GetPluginTiles(pluginKey);
 
-            var pluginTiles = _pluginResolver.GetPluginTiles(pluginKey);
-
-            foreach (Type pluginTile in pluginTiles)
+            foreach (ITile pluginTileInstance in pluginTileInstances)
             {
-                ITile pluginTileInstance =
-                    pluginTileInstances.First(pluginTileInstance1 => pluginTileInstance1.GetType() == pluginTile);
-
                 var setDependenciesMethod = pluginTileInstance.GetType().GetMethod("SetDependencies");
 
                 if (setDependenciesMethod != null)
@@ -110,7 +69,7 @@ namespace AppDash.Server.Plugins
                     object?[]? dependencies = setDependenciesMethod.GetParameters()
                         .Select(parameter =>
                         {
-                            return serviceProvider.GetService(parameter.ParameterType);
+                            return _serviceProvider.GetService(parameter.ParameterType);
                         })
                         .ToArray();
 
@@ -119,7 +78,37 @@ namespace AppDash.Server.Plugins
 
                 var pluginSettingsProperty = pluginTileInstance.GetType().GetProperty("PluginSettings");
 
-                pluginSettingsProperty?.SetValue(pluginTileInstance, _pluginSettingsManager.GetPluginSettings(pluginKey) ?? new PluginData());
+                pluginSettingsProperty?.SetValue(pluginTileInstance, _pluginSettingsManager.GetPluginSettings(pluginKey));
+
+                pluginTileInstance.OnAfterLoad().Wait();
+
+                pluginTileInstance.OnAfterLoadInternal().Wait();
+            }
+        }
+
+        private void InitializePluginPages(string pluginKey)
+        {
+            var pluginPageInstances = _pluginResolver.GetPluginPages(pluginKey);
+
+            foreach (IPage pluginTileInstance in pluginPageInstances)
+            {
+                var setDependenciesMethod = pluginTileInstance.GetType().GetMethod("SetDependencies");
+
+                if (setDependenciesMethod != null)
+                {
+                    object?[]? dependencies = setDependenciesMethod.GetParameters()
+                        .Select(parameter =>
+                        {
+                            return _serviceProvider.GetService(parameter.ParameterType);
+                        })
+                        .ToArray();
+
+                    setDependenciesMethod.Invoke(pluginTileInstance, dependencies);
+                }
+
+                var pluginSettingsProperty = pluginTileInstance.GetType().GetProperty("PluginSettings");
+
+                pluginSettingsProperty?.SetValue(pluginTileInstance, _pluginSettingsManager.GetPluginSettings(pluginKey));
 
                 pluginTileInstance.OnAfterLoad().Wait();
             }

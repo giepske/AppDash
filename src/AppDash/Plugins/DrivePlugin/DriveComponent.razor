@@ -1,0 +1,52 @@
+﻿@inherits AppDash.Plugins.Tiles.PluginTileComponent
+
+@{
+    var driveBarClass = _percentageFull >= 90 && _percentageFull < 100 ? "percentagebar-90" :
+                        _percentageFull >= 100 ? "percentagebar-100" :
+                        "";
+}
+
+<div class="d-flex flex-column justify-content-center w-100">
+    <h3>@_driveName</h3>
+    <div class="percentagebar mt-3 mb-4">
+        <div class="percentagebar-bar @driveBarClass" style="width: @_percentageFull%;">
+            <span>@_percentageFull%</span>
+        </div>
+    </div>
+    <span class="text">@(FormatSize(_totalSpace - _spaceUsed)) free of @(FormatSize(_totalSpace))</span>
+</div>
+
+@code {
+    public override string Url { get; set; }
+
+    private string _driveName;
+    private decimal _totalSpace;
+    private decimal _spaceUsed;
+
+    private long _percentageFull;
+
+    public override bool OnUpdate()
+    {
+        _driveName = Data.GetData<string>("DriveName");
+        _totalSpace = Data.GetData<long>("TotalSpace");
+        _spaceUsed = Data.GetData<long>("SpaceUsed");
+
+        _percentageFull = (long)Math.Round(_spaceUsed / _totalSpace * 100);
+
+        return true;
+    }
+
+    private string FormatSize(decimal size)
+    {
+        string[] sizes = { "B", "KB", "MB", "GB", "TB" };
+        decimal len = size;
+        int order = 0;
+        while (len >= 1024 && order < sizes.Length - 1)
+        {
+            order++;
+            len = len / 1024;
+        }
+
+        return $"{len:0.#} {sizes[order]}";
+    }
+}

@@ -3,7 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace AppDash.Plugins
 {
-    public abstract class AppDashPlugin
+    public abstract class AppDashPlugin : IPlugin
     {
         /// <summary>
         /// The name of the plugin.
@@ -38,5 +38,9 @@ namespace AppDash.Plugins
         /// </summary>
         /// <param name="services"></param>
         public abstract void ConfigureServices(IServiceCollection services);
+    }
+
+    public interface IPlugin
+    {
     }
 }

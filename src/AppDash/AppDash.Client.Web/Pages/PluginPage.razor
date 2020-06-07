@@ -26,7 +26,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        _pageComponent = await PageManager.GetPage(Page);
+        _pageComponent = await PageManager.GetPage(PluginKey, Page);
 
         await base.OnInitializedAsync();
     }
@@ -36,11 +36,15 @@
         return builder =>
         {
             builder.OpenComponent(0, component.GetType());
-            builder.AddComponentReferenceCapture(1, inst =>
+            builder.AddComponentReferenceCapture(1, async inst =>
             {
                 component = (ComponentBase)inst;
-                if(component is PluginPageComponent pageComponent)
-                    PageManager.SetPage(pageComponent);
+                if (component is PluginPageComponent pageComponent)
+                {
+                    await PageManager.SetPluginPageComponent(pageComponent);
+
+                    pageComponent.StateHasChanged();
+                }
             });
             builder.CloseComponent();
         };

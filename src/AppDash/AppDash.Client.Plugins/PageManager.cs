@@ -4,19 +4,20 @@ using System.Linq;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
+using AppDash.Plugins;
 using AppDash.Plugins.Pages;
 
 namespace AppDash.Client.Plugins
 {
     public class PageManager
     {
-        private readonly PageResolver _pageResolver;
+        private readonly PluginResolver _pluginResolver;
 
         public readonly SemaphoreSlim PageLock;
 
-        public PageManager(PageResolver pageResolver)
+        public PageManager(PluginResolver pluginResolver)
         {
-            _pageResolver = pageResolver;
+            _pluginResolver = pluginResolver;
             PageLock = new SemaphoreSlim(1, 1);
         }
         
@@ -26,7 +27,7 @@ namespace AppDash.Client.Plugins
 
             foreach (Type pageType in pageTypes)
             {
-                yield return _pageResolver.AddPage(pageType);
+                yield return _pluginResolver.LoadPluginPageComponent(pageType);
             }
         }
 
@@ -39,29 +40,29 @@ namespace AppDash.Client.Plugins
         {
             await PageLock.WaitAsync();
 
-            var pages = _pageResolver.GetPages().Values;
+            var pages = _pluginResolver.GetPageComponents();
 
             PageLock.Release();
 
             return pages;
         }
 
-        public async Task<PluginPageComponent> GetPage(string pageKey)
+        public async Task<PluginPageComponent> GetPage(string pluginKey, string pageKey)
         {
             await PageLock.WaitAsync();
 
-            var page = _pageResolver.GetPage(pageKey);
+            var page = _pluginResolver.GetPage(pluginKey, pageKey);
 
             PageLock.Release();
 
             return page;
         }
 
-        public async Task SetPage(PluginPageComponent component)
+        public async Task SetPluginPageComponent(PluginPageComponent component)
         {
             await PageLock.WaitAsync();
 
-            _pageResolver.SetPage(component);
+            _pluginResolver.SetPluginPageComponent(component);
 
             PageLock.Release();
         }
@@ -70,7 +71,7 @@ namespace AppDash.Client.Plugins
         {
             await PageLock.WaitAsync();
 
-            var mainPage = _pageResolver.GetMainPage(pluginType);
+            var mainPage = _pluginResolver.GetMainPage(pluginType);
 
             PageLock.Release();
 

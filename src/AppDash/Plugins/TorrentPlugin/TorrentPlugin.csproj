@@ -1,12 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFramework>netstandard2.1</TargetFramework>
     <RazorLangVersion>3.0</RazorLangVersion>
     <RootNamespace>TorrentPlugin</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="ChartJs.Blazor" Version="1.1.0" />
     <PackageReference Include="Microsoft.AspNetCore.Blazor.Build" Version="3.2.0-preview1.20073.1" PrivateAssets="all" />
   </ItemGroup>
 
@@ -16,6 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\AppDash.Components\AppDash.Components.csproj" />
     <ProjectReference Include="..\..\AppDash.Plugins\AppDash.Plugins.csproj" />
   </ItemGroup>
 
@@ -30,11 +32,14 @@
     <None Update="icons\rtorrent.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="js\RTorrentPlugin.js">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   
   <Import Project=".\build\build.targets" />
   
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="XCOPY &quot;$(TargetDir)$(TargetName)&quot; &quot;$(SolutionDir)AppDash.Server\bin\Debug\netcoreapp3.1\plugins\$(TargetName)\&quot; /S /Y" />
+    <Exec Command="XCOPY &quot;$(TargetDir)$(TargetName)&quot; &quot;$(ProjectDir)..\..\AppDash.Server\bin\Debug\netcoreapp3.1\plugins\$(TargetName)\&quot; /S /Y" />
   </Target>
 </Project>

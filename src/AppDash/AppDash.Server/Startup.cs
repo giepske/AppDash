@@ -1,25 +1,18 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using AppDash.Core;
-using AppDash.Plugins;
 using AppDash.Server.Core.Communication;
-using AppDash.Server.Core.Data;
-using AppDash.Server.Core.Domain.Plugins;
 using AppDash.Server.Core.Domain.Roles;
 using AppDash.Server.Core.Domain.Users;
 using AppDash.Server.Data;
-using AppDash.Server.Plugins;
+using AppDash.Server.Data.Extensions;
+using AppDash.Server.Plugins.Extensions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc.Infrastructure;
-using Microsoft.AspNetCore.Mvc.Razor;
+using Microsoft.AspNetCore.ResponseCompression;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Primitives;
 
 namespace AppDash.Server
 {
@@ -36,7 +29,7 @@ namespace AppDash.Server
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
-
+            
             services.AddSignalR();
 
             services.AddPlugins();
@@ -44,6 +37,7 @@ namespace AppDash.Server
             services.AddServices();
 
             services.AddDbContext<AppDashContext>();
+            services.AddDbContext<DbContext, AppDashContext>();
 
             services.AddRepositories();
 

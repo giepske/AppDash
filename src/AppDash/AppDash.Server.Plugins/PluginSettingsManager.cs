@@ -6,6 +6,7 @@ using AppDash.Server.Core.Data;
 using AppDash.Server.Core.Domain.Plugins;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
+using Plugin = AppDash.Server.Core.Domain.Plugins.Plugin;
 
 namespace AppDash.Server.Plugins
 {
@@ -28,7 +29,14 @@ namespace AppDash.Server.Plugins
 
             using (var scope = _serviceProvider.CreateScope())
             {
+                var pluginRepository = scope.ServiceProvider.GetService<IRepository<Plugin>>();
+
                 var pluginSettingsRepository = scope.ServiceProvider.GetService<IRepository<PluginSettings>>();
+
+                var pluginExists = pluginRepository.TableNoTracking.Any(plugin => plugin.Key == pluginKey);
+
+                if (!pluginExists)
+                    return null;
 
                 var pluginDataJson = pluginSettingsRepository.TableNoTracking.FirstOrDefault(pluginSettings =>
                     pluginSettings.PluginKey == pluginKey)?.Data;
@@ -41,35 +49,37 @@ namespace AppDash.Server.Plugins
                 {
                     _pluginSettings[pluginKey] = JsonConvert.DeserializeObject<PluginData>(pluginDataJson);
                 }
-
             }
 
-            Console.WriteLine("GetPluginSettings: " + _pluginSettings[pluginKey].GetHashCode());
             return _pluginSettings[pluginKey];
         }
 
-        public void SetPluginSettings(string pluginKey, PluginData pluginSettings)
+        public bool SetPluginSettings(string pluginKey, PluginData pluginSettings)
         {
             using (var scope = _serviceProvider.CreateScope())
             {
+                var pluginRepository = scope.ServiceProvider.GetService<IRepository<Plugin>>();
                 var pluginSettingsRepository = scope.ServiceProvider.GetService<IRepository<PluginSettings>>();
 
-                var oldPluginSettings = pluginSettingsRepository.Table.FirstOrDefault(pluginSettings =>
-                    pluginSettings.PluginKey == pluginKey);
+                var pluginExists = pluginRepository.TableNoTracking.Any(plugin => plugin.Key == pluginKey);
 
-                if(oldPluginSettings == null)
-                    oldPluginSettings = new PluginSettings
-                    {
-                        PluginKey = pluginKey
-                    };
+                if (!pluginExists)
+                    return false;
+
+                var oldPluginSettings = pluginSettingsRepository.Table.FirstOrDefault(pluginSettings1 =>
+                    pluginSettings1.PluginKey == pluginKey) ?? new PluginSettings
+                {
+                    PluginKey = pluginKey
+                };
 
                 oldPluginSettings.Data = JsonConvert.SerializeObject(pluginSettings);
 
                 pluginSettingsRepository.Update(oldPluginSettings);
             }
 
-            Console.WriteLine("SetPluginSettings: " + _pluginSettings[pluginKey].GetHashCode());
             _pluginSettings[pluginKey].Data = pluginSettings.Data;
+
+            return true;
         }
     }
 }

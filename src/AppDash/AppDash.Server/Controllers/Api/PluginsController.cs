@@ -36,21 +36,23 @@ namespace AppDash.Server.Controllers.Api
 
             return ApiResult.Success(plugins.Select(plugin =>
             {
-                var icon = string.IsNullOrEmpty(plugin.Icon) ? null : new
+                var icon = string.IsNullOrEmpty(plugin.PluginInstance.Icon) ? null : new
                 {
-                    url = $"{Request.Scheme}://{Request.Host}{Request.PathBase}/plugins/{plugin.Key}/icon",
-                    filename = plugin.Icon
+                    url = $"{Request.Scheme}://{Request.Host}{Request.PathBase}/plugins/{plugin.PluginInstance.Key}/icon",
+                    filename = plugin.PluginInstance.Icon
                 };
 
                 return new
                 {
-                    name = plugin.GetType().Name,
-                    key = plugin.Key,
+                    name = plugin.PluginInstance.GetType().Name,
+                    key = plugin.PluginInstance.Key,
+                    cssFile = plugin.CssFileUrl,
+                    jsFile = plugin.JsFileUrl,
                     icon,
                     assembly = new
                     {
-                        url = $"{Request.Scheme}://{Request.Host}{Request.PathBase}/plugins/{plugin.GetType().Assembly.GetName().Name}.dll",
-                        filename = plugin.GetType().Assembly.GetName().Name + ".dll"
+                        url = $"{Request.Scheme}://{Request.Host}{Request.PathBase}/plugins/{plugin.PluginInstance.GetType().Assembly.GetName().Name}.dll",
+                        filename = plugin.PluginInstance.GetType().Assembly.GetName().Name + ".dll"
                     }
                 };
             }));
@@ -72,7 +74,10 @@ namespace AppDash.Server.Controllers.Api
         [Route("{pluginKey}/settings")]
         public ApiResult SetSettings(string pluginKey, [FromBody] PluginData pluginSettings)
         {
-            _pluginSettingsManager.SetPluginSettings(pluginKey, pluginSettings);
+            bool result = _pluginSettingsManager.SetPluginSettings(pluginKey, pluginSettings);
+
+            if (!result)
+                return ApiResult.BadRequest();
 
             return ApiResult.NoContent();
         }
@@ -84,7 +89,7 @@ namespace AppDash.Server.Controllers.Api
         [HttpPut]
         [HttpHead]
         [HttpOptions]
-        [Route("{pluginKey}/{route}")]
+        [Route("{pluginKey}/{*route}")]
         public IActionResult ExecutePluginAction(string pluginKey, string route)
         {
             route = "/" + route;

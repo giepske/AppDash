@@ -1,5 +1,6 @@
 ﻿.list {
     display: flex;
+    flex-direction: column;
 }
 
 .list-item {

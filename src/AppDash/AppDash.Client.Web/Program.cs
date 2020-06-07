@@ -2,6 +2,7 @@
 using System.Net.Http;
 using System.Threading.Tasks;
 using AppDash.Client.Plugins;
+using AppDash.Plugins;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -15,11 +16,9 @@ namespace AppDash.Client.Web
             builder.RootComponents.Add<App>("app");
 
             builder.Services.AddSingleton<PluginManager>();
-            builder.Services.AddSingleton<PageResolver>();
             builder.Services.AddSingleton<PageManager>();
-            builder.Services.AddSingleton<SettingsResolver>();
             builder.Services.AddSingleton<SettingsManager>();
-            builder.Services.AddSingleton<TileResolver>();
+            builder.Services.AddSingleton<AssemblyManager>();
             builder.Services.AddSingleton<TileManager>();
             builder.Services.AddSingleton<PluginResolver>();
             builder.Services.AddSingleton<PluginLoader>();

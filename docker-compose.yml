@@ -1,0 +1,20 @@
+version: '3.3'
+services:
+    postgres:
+        container_name: postgres
+        environment:
+            - POSTGRES_PASSWORD=mysecretpassword
+        image: postgres
+        ports:
+            - '5432:5432'
+    appdash:
+        container_name: appdash
+        build: .
+        ports:
+            - "1234:5000"
+        environment:
+            - POSTGRES_USERNAME=appdash
+            - POSTGRES_PASSWORD=jQFDTbQ3TiAgYWxRM69m39Wj4iob9y6JLfCr
+            - POSTGRES_HOST=localhost
+            - POSTGRES_PORT=5432
+            - POSTGRES_DB=AppDash

@@ -41,6 +41,17 @@ namespace AppDash.Plugins.Tiles
         /// The plugin settings. Data should not be set here because it will not be saved.
         /// </summary>
         public PluginData PluginSettings { get; protected set; }
+
+        /// <summary>
+        /// The key of the plugin that this tile belongs to.
+        /// </summary>
+        public string PluginKey { get; set; }
+
+        /// <summary>
+        /// The key of the tile.
+        /// </summary>
+        public string TileKey { get; set; }
+
         /// <summary>
         /// The plugin this tile belongs to.
         /// </summary>
@@ -53,6 +64,7 @@ namespace AppDash.Plugins.Tiles
         protected PluginTile(TPlugin plugin, PluginTileType pluginTileType, TimeSpan updateInterval, bool refreshable, string url = null)
         {
             Plugin = plugin;
+            PluginKey = plugin.Key;
             RazorComponentType = typeof(TRazorComponent);
             PluginTileType = pluginTileType;
             UpdateInterval = updateInterval;
@@ -62,9 +74,21 @@ namespace AppDash.Plugins.Tiles
 
         /// <summary>
         /// Will be called after the plugin gets loaded, you can set <see cref="CachedData"/> and start your background threads here.
+        /// <para>
+        /// Do not yet communicate with clients here.
+        /// </para>
         /// </summary>
         /// <returns></returns>
         public virtual Task OnAfterLoad()
+        {
+            return Task.CompletedTask;
+        }
+
+        /// <summary>
+        /// Will be called after <see cref="OnAfterLoad"/>, if needed this can set background threads.
+        /// </summary>
+        /// <returns></returns>
+        public virtual Task OnAfterLoadInternal()
         {
             return Task.CompletedTask;
         }

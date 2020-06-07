@@ -31,7 +31,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        var plugins = (await PluginManager.GetPlugins()).ToList();
+        var plugins = (await PluginManager.GetPluginInstances()).ToList();
 
         foreach (AppDashPlugin plugin in plugins)
         {

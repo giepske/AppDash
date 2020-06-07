@@ -20,7 +20,7 @@
     }
     else
     {
-        <span class="text-danger">Unable to get server status. Please set the server in the <a href="@($"/settings/plugins/{PluginKey}")">plugin settings</a>.</span>
+        <span class="text-danger">Unable to get server status. Please set the server in the <a href="@($"/settings/plugins/{PluginKey}")">plugin settings</a>. If you've already done so the server may simply be down.</span>
     }
 }
 
@@ -33,6 +33,8 @@
     
     public override bool OnUpdate()
     {
+        Console.WriteLine(Data);
+
         var serverStatus = Data.GetData<MinecraftServerHelper.StatusResponse>("ServerStatus");
 
         Console.WriteLine("ServerStatusTileComponent " + serverStatus);

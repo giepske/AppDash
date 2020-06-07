@@ -27,9 +27,11 @@ namespace AppDash.Server.Controllers.Api
 
             return ApiResult.Success(tiles.Select(tile => new
             {
-                name = tile.GetType().Name,
-                plugin = tile.GetType().BaseType?.GenericTypeArguments[0].Name,
-                pluginTileComponent = tile.GetType().BaseType?.GenericTypeArguments[1].Name,
+                name = tile.GetType().FullName,
+                tileKey = tile.TileKey,
+                plugin = tile.GetType().BaseType?.GenericTypeArguments[0].FullName,
+                pluginTileComponent = tile.GetType().BaseType?.GenericTypeArguments[1].FullName,
+                assembly = tile.GetType().Assembly.FullName,
                 cachedData = tile.CachedData
             }));
         }

@@ -107,6 +107,32 @@ namespace AppDash.Server.Data.Migrations
                     b.ToTable("AspNetRoles");
                 });
 
+            modelBuilder.Entity("AppDash.Server.Core.Domain.Tiles.Tile", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasAnnotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn);
+
+                    b.Property<int>("FactoryIndex")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Key")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("TileFactory")
+                        .HasColumnType("text");
+
+                    b.Property<string>("UniqueIdentifier")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Tile");
+                });
+
             modelBuilder.Entity("AppDash.Server.Core.Domain.Users.User", b =>
                 {
                     b.Property<int>("Id")

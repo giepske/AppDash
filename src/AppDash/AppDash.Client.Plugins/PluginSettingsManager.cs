@@ -1,11 +1,8 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using AppDash.Core;
 using AppDash.Plugins;
-using AppDash.Server.Core.Data;
-using AppDash.Server.Core.Domain.Plugins;
 
 namespace AppDash.Client.Plugins
 {

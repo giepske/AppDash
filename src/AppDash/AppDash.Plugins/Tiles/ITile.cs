@@ -11,18 +11,20 @@ namespace AppDash.Plugins.Tiles
         TimeSpan UpdateInterval { get; }
         PluginData CachedData { get; }
         PluginData PluginSettings { get; }
+        string PluginKey { get; set; }
+        string TileKey { get; set; }
 
         /// <summary>
-        /// Will be called after the plugin gets loaded.
+        /// Will be called after the plugin gets loaded. Do not yet communicate with clients here.
         /// </summary>
         /// <returns></returns>
         Task OnAfterLoad();
 
         /// <summary>
-        /// Sets the dependencies for the tile.
+        /// Will be called after <see cref="OnAfterLoad"/>, if needed this can set background threads.
         /// </summary>
-        /// <param name="dependencies"></param>
-        //void SetDependencies(params object[] dependencies);
+        /// <returns></returns>
+        Task OnAfterLoadInternal();
 
         /// <summary>
         /// Should be called if the tile needs to be updated.

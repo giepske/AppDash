@@ -9,7 +9,7 @@
         @foreach (PluginTileComponent component in _components)
         {
             <GridItem>
-                <Tile TileComponent="component"></Tile>
+                <Tile TileComponent="component" TileKey="@component.TileKey"></Tile>
             </GridItem>
         }
     }

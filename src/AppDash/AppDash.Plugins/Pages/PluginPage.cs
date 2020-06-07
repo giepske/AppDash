@@ -37,6 +37,12 @@ namespace AppDash.Plugins.Pages
         /// </para>
         /// </summary>
         public PluginData CachedData { get; protected set; }
+
+        /// <summary>
+        /// The key of the plugin that this page belongs to.
+        /// </summary>
+        public string PluginKey { get; }
+
         /// <summary>
         /// The plugin this page belongs to.
         /// </summary>
@@ -49,6 +55,7 @@ namespace AppDash.Plugins.Pages
         protected PluginPage(TPlugin plugin, PluginPageType pluginPageType, TimeSpan updateInterval, bool refreshable, string url = null)
         {
             Plugin = plugin;
+            PluginKey = plugin.Key;
             RazorComponentType = typeof(TRazorComponent);
             PluginPageType = pluginPageType;
             UpdateInterval = updateInterval;

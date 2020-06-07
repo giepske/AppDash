@@ -19,7 +19,6 @@
     <ProjectReference Include="..\AppDash.Plugins\AppDash.Plugins.csproj" />
     <ProjectReference Include="..\AppDash.Server.Core\AppDash.Server.Core.csproj" />
     <ProjectReference Include="..\AppDash.Server.Data\AppDash.Server.Data.csproj" />
-    <ProjectReference Include="..\Plugins\TorrentPlugin\TorrentPlugin.csproj" />
   </ItemGroup>
 
   <ItemGroup>

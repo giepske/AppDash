@@ -2,6 +2,7 @@
 @using System.Reflection
 
 @inject PluginLoader PluginLoader
+@inject IJSRuntime JsRuntime
 
 <div class="pluginloaderoverlay @(_hiding ? "pluginloaderoverlay-hiding" : "") @(_hidden ? "pluginloaderoverlay-hidden" : "")">
     <div class="pluginloaderoverlay-inner">
@@ -26,7 +27,7 @@
         PluginLoader.OnPagesLoadStart = OnPagesLoadStart;
         PluginLoader.OnSettingsLoadStart = OnSettingsLoadStart;
 
-        await PluginLoader.LoadPlugins();
+        await PluginLoader.LoadPlugins(JsRuntime);
 
         _hiding = true;
 

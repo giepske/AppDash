@@ -8,6 +8,8 @@ using AppDash.Plugins;
 using AppDash.Plugins.Tiles;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.SignalR.Client;
+using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 
 namespace AppDash.Client.Web.Pages
 {
@@ -15,12 +17,6 @@ namespace AppDash.Client.Web.Pages
     {
         [Inject]
         private NavigationManager _navigationManager { get; set; }
-
-        [Inject]
-        private PluginLoader PluginLoader { get; set; }
-
-        [Inject]
-        private PluginManager PluginManager { get; set; }
 
         [Inject]
         private TileManager TileManager { get; set; }
@@ -31,21 +27,19 @@ namespace AppDash.Client.Web.Pages
 
         protected override async Task OnInitializedAsync()
         {
-            //set events methods
-
-            //await PluginLoader.LoadPlugins();
-
-            _components = (await TileManager.GetTiles()).ToList();
-
-            Console.WriteLine("Components loaded: " + _components.Count);
+            _components = (await TileManager.GetPluginTileComponents()).ToList();
 
             hubConnection = new HubConnectionBuilder()
                 .WithUrl(_navigationManager.ToAbsoluteUri("/chatHub"))
+                .ConfigureLogging(options =>
+                {
+                    options.SetMinimumLevel(LogLevel.Debug);
+                })
                 .Build();
 
-            hubConnection.On<string, PluginData>("UpdateTileData", async (tileKey, pluginData) =>
+            hubConnection.On<string, string, PluginData>("UpdateTileData", async (pluginKey, tileKey, pluginData) =>
             {
-                var tile = await TileManager.GetTile(tileKey);
+                var tile = await TileManager.GetPluginTileComponent(pluginKey, tileKey);
 
                 tile.Data = pluginData;
 

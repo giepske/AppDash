@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Razor">
+﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
@@ -6,23 +6,19 @@
     <LangVersion>8</LangVersion>
   </PropertyGroup>
 
-
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Components" Version="3.1.4" />
     <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="3.1.4" />
   </ItemGroup>
-
 
   <ItemGroup>
     <ProjectReference Include="..\..\AppDash.Components\AppDash.Components.csproj" />
     <ProjectReference Include="..\..\AppDash.Plugins\AppDash.Plugins.csproj" />
   </ItemGroup>
 
-
   <ItemGroup>
     <Folder Include="icons\" />
   </ItemGroup>
-
 
   <ItemGroup>
     <None Update="icons\minecraft.png">
@@ -33,6 +29,6 @@
   <Import Project=".\build\build.targets" />
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="XCOPY &quot;$(TargetDir)$(TargetName)&quot; &quot;$(SolutionDir)AppDash.Server\bin\Debug\netcoreapp3.1\plugins\$(TargetName)\&quot; /S /Y" />
+    <Exec Command="XCOPY &quot;$(TargetDir)$(TargetName)&quot; &quot;$(ProjectDir)..\..\AppDash.Server\bin\Debug\netcoreapp3.1\plugins\$(TargetName)\&quot; /S /Y" />
   </Target>
 </Project>
