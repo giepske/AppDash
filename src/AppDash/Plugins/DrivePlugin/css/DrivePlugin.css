@@ -1,0 +1,28 @@
+﻿.percentagebar {
+    width: 100%;
+    height: 25px;
+    transition: 0.5s all;
+    background: #3c3c3c;
+    box-shadow: 0 2px 3px 0 rgba(13,13,13,1);
+    border-radius: 4px;
+}
+
+.percentagebar-bar {
+    height: 25px;
+    background: #0b7ce7;
+    transition: 0.5s all;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.percentagebar-90 {
+    background: orange;
+    transition: 0.5s all;
+}
+
+.percentagebar-100 {
+    background: red;
+    transition: 0.5s all;
+}

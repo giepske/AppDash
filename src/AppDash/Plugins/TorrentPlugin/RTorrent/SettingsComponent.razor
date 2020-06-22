@@ -1,0 +1,124 @@
+﻿@using AppDash.Core
+@using Newtonsoft.Json.Linq
+@inherits AppDash.Plugins.Settings.PluginSettingsComponent
+
+@inject NavigationManager NavigationManager
+
+<FormGroup>
+    <Input Title="rTorrent address" Text="Fill in the IP address/host without port of your rTorrent instance below, localhost by default." Value="@_host" OnChange="@(value => OnHostChange(value))" />
+</FormGroup>
+
+<FormGroup>
+    <Input Title="Port" Type="number" Placeholder="5000" Text="The XML-RPC port you are using, 5000 by default." Value="@_port" OnChange="@(value => OnPortChange(value))" />
+</FormGroup>
+
+<FormGroup>
+    <Button Text="Login" Disabled="@(!IsValidInput())" OnClick="@(async () => await Login())"></Button>
+    @if (!string.IsNullOrEmpty(_testConnectionError))
+    {
+        <span class="text-danger">@_testConnectionError</span>
+    }
+    else if (!string.IsNullOrEmpty(_testConnectionSuccess))
+    {
+        <span class="text-success">@_testConnectionSuccess</span>
+    }
+</FormGroup>
+
+<FormGroup>
+    <Button Text="Save" Disabled="@(!IsValidInput() || string.IsNullOrEmpty(_testConnectionSuccess))" OnClick="@(async () => await Save())"></Button>
+</FormGroup>
+
+@code
+{
+    private string _host;
+    private int? _port;
+
+    private bool _isSuccess;
+    private string _testConnectionError;
+    private string _testConnectionSuccess;
+
+    public override Task Initialize()
+    {
+        _host = SettingsData.GetData<string>("Host");
+        _port = SettingsData.GetData<int>("Port");
+
+        if (string.IsNullOrEmpty(_host))
+            _host = "localhost";
+
+        if (!_port.HasValue || _port.Value < 255 || _port.Value > 65535)
+            _port = 5000;
+
+        return Task.CompletedTask;
+    }
+
+    private async Task Login()
+    {
+        if (!IsValidInput())
+            return;
+
+        var result = await HttpClient.PostJson<JObject>(NavigationManager.BaseUri + $"api/plugins/{PluginKey}/rTorrent/test", new
+        {
+            Host = _host,
+            Port = _port
+        });
+
+        if (result["isSuccess"]?.Value<bool>() ?? false)
+        {
+            _testConnectionSuccess = "Successfully logged in.";
+            _testConnectionError = null;
+        }
+        else
+        {
+            _testConnectionError = "Unable to login, make sure your credentials and web-UI address/port are correct.";
+            _testConnectionSuccess = null;
+        }
+
+        StateHasChanged();
+    }
+
+    private async Task Save()
+    {
+        if (!IsValidInput())
+            return;
+
+        SettingsData.SetData("Host", _host);
+        SettingsData.SetData("Port", _port);
+
+        await SaveSettingsData();
+    }
+
+    private Task OnHostChange(string value)
+    {
+        _host = value;
+
+        StateHasChanged();
+
+        return Task.CompletedTask;
+    }
+
+    private Task OnPortChange(string value)
+    {
+        _port = int.Parse(value);
+
+        StateHasChanged();
+
+        return Task.CompletedTask;
+    }
+
+    private bool IsValidInput()
+    {
+        if (string.IsNullOrEmpty(_host))
+            return false;
+
+        if (Uri.CheckHostName(_host) == UriHostNameType.Unknown)
+            return false;
+
+        if (!_port.HasValue)
+            return false;
+
+        if (_port.Value > 65535 || _port.Value < 255)
+            return false;
+
+        return true;
+    }
+}

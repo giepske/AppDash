@@ -11,6 +11,9 @@ using AppDash.Plugins.Pages;
 using AppDash.Plugins.Settings;
 using AppDash.Plugins.Tiles;
 using Microsoft.AspNetCore.Components;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.JSInterop;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace AppDash.Client.Plugins
@@ -22,6 +25,7 @@ namespace AppDash.Client.Plugins
     {
         private readonly HttpClient _httpClient;
         private readonly PluginManager _pluginManager;
+        private readonly AssemblyManager _assemblyManager;
         private readonly TileManager _tileManager;
         private readonly NavigationManager _navigationManager;
         private readonly PageManager _pageManager;
@@ -59,10 +63,11 @@ namespace AppDash.Client.Plugins
         /// </summary>
         public Action<Assembly> OnSettingsLoadStart;
 
-        public PluginLoader(HttpClient httpClient, PluginManager pluginManager, TileManager tileManager, NavigationManager navigationManager, PageManager pageManager, SettingsManager settingsManager)
+        public PluginLoader(HttpClient httpClient, PluginManager pluginManager, AssemblyManager assemblyManager, TileManager tileManager, NavigationManager navigationManager, PageManager pageManager, SettingsManager settingsManager)
         {
             _httpClient = httpClient;
             _pluginManager = pluginManager;
+            _assemblyManager = assemblyManager;
             _tileManager = tileManager;
             _navigationManager = navigationManager;
             _pageManager = pageManager;
@@ -75,8 +80,9 @@ namespace AppDash.Client.Plugins
         /// Use OnPluginLoadStart,
         /// </para>
         /// </summary>
+        /// <param name="jsRuntime"></param>
         /// <returns></returns>
-        public async Task LoadPlugins()
+        public async Task LoadPlugins(IJSRuntime jsRuntime)
         {
             await _pluginManager.PluginLock.WaitAsync();
             await _tileManager.TileLock.WaitAsync();
@@ -99,18 +105,40 @@ namespace AppDash.Client.Plugins
 
                     try
                     {
-                        var assembly = await _pluginManager.LoadAssembly(assemblyUrl);
+                        Console.WriteLine("Loading assembly: " + assemblyUrl);
+
+                        var assembly = await _assemblyManager.LoadAssembly(assemblyUrl);
 
                         Dictionary<string, string> pluginKeys = plugins.ToDictionary(
                             plugin => plugin["key"].Value<string>(),
                             plugin => plugin["name"].Value<string>());
 
                         _pluginManager.LoadPlugins(assembly, pluginKeys);
+
+
                     }
                     catch (Exception e)
                     {
                         Console.WriteLine(e);
                     }
+                }
+
+                var cssFiles = plugins.Select(plugin => plugin["cssFile"]?.Value<string>())
+                    .Where(cssFile => !string.IsNullOrEmpty(cssFile))
+                    .Distinct();
+
+                foreach (string cssFile in cssFiles)
+                {
+                    await jsRuntime.InvokeVoidAsync("loadPluginCssFile", cssFile);
+                }
+
+                var jsFiles = plugins.Select(plugin => plugin["jsFile"]?.Value<string>())
+                    .Where(jsFile => !string.IsNullOrEmpty(jsFile))
+                    .Distinct();
+
+                foreach (string jsFile in jsFiles)
+                {
+                    await jsRuntime.InvokeVoidAsync("loadPluginJsFile", jsFile);
                 }
             }
             catch (Exception e)
@@ -135,13 +163,24 @@ namespace AppDash.Client.Plugins
             {
                 List<PluginTileComponent> tiles = new List<PluginTileComponent>();
 
-                foreach (var assembly in await _pluginManager.GetAssemblies())
+                var response = await _httpClient.GetJson<ApiResult>("api/tiles");
+                var tileDataList = response.GetData<JArray>();
+
+                foreach (var assembly in await _assemblyManager.GetAssemblies())
                 {
                     OnTilesLoadStart?.Invoke(assembly);
 
                     try
                     {
-                        tiles.AddRange(_tileManager.LoadTiles(assembly));
+                        List<Tuple<string, Type>> tileKeys = new List<Tuple<string, Type>>();
+
+                        foreach (JToken tileData in tileDataList.Where(tileData => tileData["assembly"].Value<string>() == assembly.GetName().FullName))
+                        {
+                            tileKeys.Add(new Tuple<string, Type>(tileData["tileKey"].Value<string>(), 
+                                assembly.GetType(tileData["pluginTileComponent"].Value<string>())));
+                        }
+
+                        tiles.AddRange(_tileManager.LoadTiles(assembly, tileKeys));
                     }
                     catch (Exception e)
                     {
@@ -157,17 +196,11 @@ namespace AppDash.Client.Plugins
                 {
                     Console.WriteLine(e);
                 }
-
-                var response = await _httpClient.GetJson<ApiResult>("api/tiles");
-                var tileDataList = response.GetData<JArray>();
-
+                
                 foreach (PluginTileComponent tileComponent in tiles)
                 {
-                    var plugin = _pluginManager.GetPlugin(tileComponent);
-
                     var tile = tileDataList.First(tileData =>
-                        tileData["plugin"].Value<string>() == plugin.GetType().Name &&
-                        tileData["pluginTileComponent"].Value<string>() == tileComponent.GetType().Name );
+                        tileData["tileKey"].Value<string>() == tileComponent.TileKey);
 
                     var cachedData = tile["cachedData"].ToObject<PluginData>();
 
@@ -192,7 +225,7 @@ namespace AppDash.Client.Plugins
             {
                 List<PluginPageComponent> pages = new List<PluginPageComponent>();
 
-                foreach (var assembly in await _pluginManager.GetAssemblies())
+                foreach (var assembly in await _assemblyManager.GetAssemblies())
                 {
                     OnPagesLoadStart?.Invoke(assembly);
 
@@ -240,7 +273,7 @@ namespace AppDash.Client.Plugins
             {
                 List<PluginSettingsComponent> settings = new List<PluginSettingsComponent>();
 
-                foreach (var assembly in await _pluginManager.GetAssemblies())
+                foreach (var assembly in await _assemblyManager.GetAssemblies())
                 {
                     OnSettingsLoadStart?.Invoke(assembly);
 
@@ -261,7 +294,7 @@ namespace AppDash.Client.Plugins
 
                 try
                 {
-                    _settingsManager.InitializeSettings();
+                    await _settingsManager.InitializeSettings();
                 }
                 catch (Exception e)
                 {
@@ -278,7 +311,7 @@ namespace AppDash.Client.Plugins
                 _settingsManager.SettingsLock.Release();
             }
 
-            Console.WriteLine($"Loaded {(await _settingsManager.GetSettings()).Count()} settings");
+            Console.WriteLine($"Loaded {(await _settingsManager.GetSettingComponents()).Count()} settings");
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿@using AppDash.Client.Plugins
 @using AppDash.Plugins.Tiles
+@using Newtonsoft.Json
 @inject PluginManager PluginManager;
 @inject TileManager TileManager;
 
@@ -17,18 +18,24 @@
     [Parameter]
     public PluginTileComponent TileComponent { get; set; }
 
+    [Parameter]
+    public string TileKey { get; set; }
+
     RenderFragment RenderComponent(ComponentBase component)
     {
         return builder =>
         {
             builder.OpenComponent(0, component.GetType());
-            builder.AddComponentReferenceCapture(1, inst =>
+            builder.AddComponentReferenceCapture(1, async inst =>
             {
                 component = (ComponentBase)inst;
                 if (component is PluginTileComponent tileComponent)
                 {
-                    TileManager.SetTile(tileComponent);
+                    await TileManager.SetPluginTileComponent(TileKey, tileComponent);
+
                     tileComponent.OnUpdate();
+
+                    tileComponent.StateHasChanged();
                 }
             });
             builder.CloseComponent();

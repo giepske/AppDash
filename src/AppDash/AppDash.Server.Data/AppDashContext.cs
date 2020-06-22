@@ -14,8 +14,13 @@ namespace AppDash.Server.Data
     {
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
+            string username = Environment.GetEnvironmentVariable("POSTGRES_USERNAME");
+            string password = Environment.GetEnvironmentVariable("POSTGRES_PASSWORD");
+            string host = Environment.GetEnvironmentVariable("POSTGRES_HOST");
+            string port = Environment.GetEnvironmentVariable("POSTGRES_PORT");
+            string database = Environment.GetEnvironmentVariable("POSTGRES_DB");
             //TODO add config for data
-            optionsBuilder.UseNpgsql("User ID=appdash;Password=jQFDTbQ3TiAgYWxRM69m39Wj4iob9y6JLfCr;Host=localhost;Port=5432;Database=AppDash;");
+            optionsBuilder.UseNpgsql($"User ID={username};Password={password};Host={host};Port={port};Database={database};");
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -32,5 +37,4 @@ namespace AppDash.Server.Data
             base.OnModelCreating(modelBuilder);
         }
     }
-
 }

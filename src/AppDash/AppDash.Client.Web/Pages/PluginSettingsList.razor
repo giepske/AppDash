@@ -1,6 +1,7 @@
 ﻿@page "/settings/plugins"
 
 @using AppDash.Client.Plugins
+@using AppDash.Plugins
 @using AppDash.Plugins.Settings
 
 @inject SettingsManager SettingsManager
@@ -10,16 +11,15 @@
     <List>
         @foreach (var settingsComponent in _settingsComponents)
         {
-            var plugin = PluginResolver.GetPlugin(settingsComponent.Key);
+            var plugin = PluginResolver.GetPluginInstance(settingsComponent.PluginKey);
             <ListItem Class="no-link-decoration" Link="true" Page="@($"settings/plugins/{plugin.Key}")">
                 <div class="pluginsettingslist-item">
-                    <img class="pluginsettingslist-item-icon m-2" src="@($"https://localhost:5001/plugins/{plugin.Key}/icon")"/>
+                    <img class="pluginsettingslist-item-icon m-2" src="@($"/plugins/{plugin.Key}/icon")"/>
                     <div class="pluginsettingslist-item-text">
                         <span class="pluginsettingslist-item-name h2">@plugin.Name</span>
                         <span class="pluginsettingslist-item-description">@plugin.Description</span>
                     </div>
                 </div>
-
             </ListItem>
         }
     </List>
@@ -27,11 +27,11 @@
 <Input />
 
 @code {
-    private List<KeyValuePair<string, PluginSettingsComponent>> _settingsComponents = new List<KeyValuePair<string, PluginSettingsComponent>>();
+    private List<PluginSettingsComponent> _settingsComponents = new List<PluginSettingsComponent>();
 
     protected override async Task OnInitializedAsync()
     {
-        _settingsComponents = (await SettingsManager.GetSettings()).ToList();
+        _settingsComponents = (await SettingsManager.GetSettingComponents()).ToList();
 
         Console.WriteLine($"{_settingsComponents.Count} settings components");
     }

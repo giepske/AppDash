@@ -12,8 +12,8 @@ namespace AppDash.Core
     /// </summary>
     public class PermissionMemoryCache
     {
-        private object _lockObj;
-        private Dictionary<string, Permissions?> _clients;
+        private readonly object _lockObj;
+        private readonly Dictionary<string, Permissions?> _clients;
 
         public PermissionMemoryCache()
         {

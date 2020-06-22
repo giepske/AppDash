@@ -7,28 +7,32 @@ using AppDash.Plugins.Controllers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.Routing.Template;
+using Newtonsoft.Json;
 
 namespace AppDash.Server.Plugins
 {
     public class PluginControllerMatcher
     {
         private readonly PluginManager _pluginManager;
-        private readonly PluginResolver _pluginResolver;
 
-        public PluginControllerMatcher(PluginManager pluginManager, PluginResolver pluginResolver)
+        public PluginControllerMatcher(PluginManager pluginManager)
         {
             _pluginManager = pluginManager;
-            _pluginResolver = pluginResolver;
         }
 
         public bool TryMatch(string pluginKey, string route, out (IPluginController, MethodInfo) pluginController)
         {
             pluginController = default;
 
+            if (route == null)
+                return false;
+
             var controllers = _pluginManager.GetPluginControllers(pluginKey)?.ToList();
 
             if (controllers == null || !controllers.Any())
                 return false;
+
+            route = GetRoute(route);
 
             foreach (IPluginController controller in controllers)
             {
@@ -79,13 +83,20 @@ namespace AppDash.Server.Plugins
         {
             pluginController.PluginKey = pluginKey;
 
+            route = GetRoute(route);
+
             var pluginControllerRoute = method.GetCustomAttribute<PluginControllerRouteAttribute>();
 
             var values = GetValues(GetRoute(pluginControllerRoute.Template), route);
 
             object[] parameters = GetParameters(method, requestBody, values);
 
-            return (IActionResult)method.Invoke(pluginController, parameters);
+            var result = method.Invoke(pluginController, parameters);
+
+            if (result is IActionResult actionResult)
+                return actionResult;
+
+            return new ObjectResult(result);
         }
 
         private object[] GetParameters(MethodInfo method, Stream requestBody, RouteValueDictionary values)
@@ -98,7 +109,8 @@ namespace AppDash.Server.Plugins
                 {
                     using (StreamReader reader = new StreamReader(requestBody))
                     {
-                        parameters.Add(System.Text.Json.JsonSerializer.Deserialize(reader.ReadToEndAsync().Result, parameter.ParameterType));
+                        string result = reader.ReadToEndAsync().Result;
+                        parameters.Add(JsonConvert.DeserializeObject(result, parameter.ParameterType));
                     }
                 }
                 else

@@ -12,7 +12,9 @@ namespace AppDash.Plugins.Settings
     {
         public HttpClient HttpClient { get; set; }
 
-        [Parameter]
+        /// <summary>
+        /// The plugin key that this settings component belongs to.
+        /// </summary>
         public string PluginKey { get; set; }
 
         /// <summary>

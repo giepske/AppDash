@@ -20,7 +20,7 @@ namespace AppDash.Plugins.Tiles
         {
 
         }
-
+        
         private void SetDependencies(IHubContext<ChatHub> hubContext, PermissionMemoryCache permissionMemoryCache)
         {
             _hubContext = hubContext;
@@ -32,7 +32,7 @@ namespace AppDash.Plugins.Tiles
             //TODO fix permissions, now it doesn't use permissions at all
             var clients = _hubContext.Clients.Clients(_permissionMemoryCache.GetClients(null).ToList());
 
-            clients.SendAsync("UpdateTileData", RazorComponentType.FullName, pluginData).Wait();
+            clients.SendAsync("UpdateTileData", PluginKey, TileKey, pluginData).Wait();
         }
     }
 }

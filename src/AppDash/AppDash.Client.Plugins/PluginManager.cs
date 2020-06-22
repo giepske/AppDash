@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using AppDash.Plugins;
+using AppDash.Plugins.Settings;
 using AppDash.Plugins.Tiles;
 using Microsoft.AspNetCore.Components;
 using Newtonsoft.Json;
@@ -14,55 +14,21 @@ namespace AppDash.Client.Plugins
 {
     public class PluginManager
     {
-        private readonly HttpClient _httpClient;
-        private readonly NavigationManager _navigationManager;
         private readonly PluginResolver _pluginResolver;
 
         public readonly SemaphoreSlim PluginLock;
 
-        private List<Assembly> _assemblies;
-
-        public PluginManager(HttpClient httpClient, NavigationManager navigationManager, PluginResolver pluginResolver)
+        public PluginManager(PluginResolver pluginResolver)
         {
-            _httpClient = httpClient;
-            _navigationManager = navigationManager;
             _pluginResolver = pluginResolver;
-            _assemblies = new List<Assembly>();
             PluginLock = new SemaphoreSlim(1, 1);
         }
-
-        /// <summary>
-        /// Download a plugin assembly from the url and load it as an assembly.
-        /// </summary>
-        /// <param name="url"></param>
-        /// <returns></returns>
-        public async Task<Assembly> LoadAssembly(string url)
-        {
-            var assemblyBytes = await _httpClient.GetByteArrayAsync(url);
-
-            var assembly = Assembly.Load(assemblyBytes);
-
-            _assemblies.Add(assembly);
-
-            return assembly;
-        }
-
-        public async Task<IEnumerable<Assembly>> GetAssemblies()
+        
+        public async Task<IEnumerable<AppDashPlugin>> GetPluginInstances()
         {
             await PluginLock.WaitAsync();
 
-            var assemblies = _assemblies;
-
-            PluginLock.Release();
-
-            return assemblies;
-        }
-
-        public async Task<IEnumerable<AppDashPlugin>> GetPlugins()
-        {
-            await PluginLock.WaitAsync();
-
-            var plugins = _pluginResolver.GetPlugins().Values;
+            var plugins = _pluginResolver.GetPluginInstances();
 
             PluginLock.Release();
 
@@ -75,17 +41,15 @@ namespace AppDash.Client.Plugins
 
             foreach (Type pluginType in pluginTypes)
             {
-                var plugin = _pluginResolver.AddPlugin(pluginType);
+                var pluginKey = pluginKeys.FirstOrDefault(e => e.Value == pluginType.Name).Key;
 
-                var pluginKey = pluginKeys.FirstOrDefault(e => e.Value == plugin.GetType().Name).Key;
+                var plugin = _pluginResolver.AddPlugin(pluginType, pluginKey);
 
-                plugin.Key = pluginKey;
-
-                Console.WriteLine($"{plugin.Name} set key to {pluginKey}");
+                Console.WriteLine($"{plugin.PluginInstance.Name} set key to {pluginKey}");
             }
         }
 
-        public AppDashPlugin GetPlugin(PluginTileComponent pluginTileComponent)
+        public AppDashPlugin GetPluginInstance(PluginTileComponent pluginTileComponent)
         {
             var tileTypes = pluginTileComponent.GetType().Assembly.GetTypes()
                 .Where(type => typeof(ITile).IsAssignableFrom(type)).ToList();
@@ -99,7 +63,24 @@ namespace AppDash.Client.Plugins
             if (pluginType == null)
                 return null;
 
-            return _pluginResolver.GetPlugin(pluginType);
+            return _pluginResolver.GetPluginInstance(pluginType);
+        }
+
+        public AppDashPlugin GetPluginInstance(PluginSettingsComponent pluginSettingsComponent)
+        {
+            var settingsTypes = pluginSettingsComponent.GetType().Assembly.GetTypes()
+                .Where(type => typeof(ISettings).IsAssignableFrom(type)).ToList();
+
+            if (!settingsTypes.Any())
+                return null;
+
+            var pluginType = settingsTypes.FirstOrDefault(settingsType => settingsType.BaseType?.GenericTypeArguments[1] == pluginSettingsComponent.GetType())
+                ?.BaseType?.GenericTypeArguments.FirstOrDefault();
+
+            if (pluginType == null)
+                return null;
+
+            return _pluginResolver.GetPluginInstance(pluginType);
         }
     }
 }

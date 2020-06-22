@@ -7,7 +7,7 @@ namespace AppDash.Server.Data
 {
     public class Repository<TEntity> : IRepository<TEntity> where TEntity : BaseEntity
     {
-        private readonly AppDashContext _context;
+        private readonly DbContext _context;
 
         private DbSet<TEntity> _entities;
 
@@ -16,7 +16,7 @@ namespace AppDash.Server.Data
 
         protected virtual DbSet<TEntity> Entities => _entities ??= _context.Set<TEntity>();
 
-        public Repository(AppDashContext context)
+        public Repository(DbContext context)
         {
             _context = context;
         }
@@ -31,6 +31,22 @@ namespace AppDash.Server.Data
             entity = Entities.Add(entity).Entity;
 
             _context.SaveChanges();
+
+            return entity;
+        }
+
+        /// <summary>
+        /// Insert the entity without tracking it, this should be used as little as possible and only exists for unit testing.
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <returns></returns>
+        public TEntity InsertNoTracking(TEntity entity)
+        {
+            entity = Entities.Add(entity).Entity;
+
+            _context.SaveChanges();
+
+            _context.Entry(entity).State = EntityState.Detached;
 
             return entity;
         }

@@ -8,7 +8,7 @@ namespace TorrentPlugin.RTorrent
 {
     public class RTorrentPage : UpdatingPluginPage<RTorrentPlugin, RTorrentPageComponent>
     {
-        public RTorrentPage(RTorrentPlugin plugin) : base(plugin, TimeSpan.FromSeconds(1))
+        public RTorrentPage(RTorrentPlugin plugin) : base(plugin, TimeSpan.FromMinutes(1))
         {
         }
 

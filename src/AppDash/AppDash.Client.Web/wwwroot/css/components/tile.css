@@ -1,7 +1,10 @@
 ﻿.tile-content {
-    margin-right: 60px;
     display: flex;
     height: 100%;
+}
+
+.tile-content-link {
+    margin-right: 64px;
 }
 
 .tile-link {

@@ -1,24 +1,4 @@
 ﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-
-  <!--
-  <UsingTask
-    TaskName="Test"
-    TaskFactory="CodeTaskFactory"
-    AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll" >
-    <ParameterGroup />
-    <Task>
-      <Reference Include="$(TargetDir)\$(TargetFileName)"/>
-      <Using Namespace="System"/>
-      <Using Namespace="$(RootNamespace)"/>
-      <Code Type="Fragment" Language="cs">
-        <![CDATA[
-        Log.LogError("Test");
-        ]]>
-      </Code>
-    </Task>
-  </UsingTask>
-  -->
-
   <Target Name="CreatePluginFolderTask" AfterTargets="PostBuildEvent">
     <PropertyGroup>
       <PackageDirectory>$(TargetDir)$(TargetName)</PackageDirectory>
@@ -28,12 +8,24 @@
       <IconFiles Include="$(TargetDir)icons\*.*" />
     </ItemGroup>
 
-    <!-- <Test /> -->
+    <ItemGroup>
+      <JSFiles Include="$(TargetDir)js\*.*" />
+    </ItemGroup>
 
     <RemoveDir Directories="$(PackageDirectory)"/>
     <MakeDir Directories="$(PackageDirectory)"/>
+
     <Copy SourceFiles="$(TargetDir)$(TargetFileName)" DestinationFolder="$(PackageDirectory)"/>
+
     <Copy SourceFiles="@(IconFiles)" DestinationFolder="$(PackageDirectory)\icons"/>
+
+    <Copy SourceFiles="$(TargetDir)css\$(TargetName).css"
+          DestinationFolder="$(PackageDirectory)\css"
+          Condition="Exists('$(TargetDir)css\$(TargetName).css')"/>
+
+    <Copy SourceFiles="@(JSFiles)"
+          DestinationFolder="$(PackageDirectory)\js"/>
+
     <Message Text="=================================================================="  Importance="high" />
     <Message Text="Created plugin folder in: $(PackageDirectory)"  Importance="high" />
     <Message Text="=================================================================="  Importance="high" />
